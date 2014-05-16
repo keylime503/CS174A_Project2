@@ -551,140 +551,140 @@ void display(void)
     set_colour(getRgbFloat(131), getRgbFloat(181), getRgbFloat(106)); // forest green color
     drawCube();
     
-    // model tree trunk
-    for (int i=0; i < 8; i++) {
-        
-        float treeRotationAngleInRads = treeRotationAngle * i * DegreesToRadians;
-        
-        model_trans = mvstack.pop();
-        model_trans *= Translate(-(0.375 * sin(treeRotationAngleInRads)), (0.375 + (0.375 * cos(treeRotationAngleInRads))), 0);
-        model_trans *= RotateZ(treeRotationAngle * i);
-        mvstack.push(model_trans);
-        model_trans *= Scale(0.25, 0.75, 0.25);
-        model_view = view_trans * model_trans;
-        set_colour(getRgbFloat(160), getRgbFloat(82), getRgbFloat(45));
-        drawCube();
-        
-        model_trans = mvstack.pop();
-        mvstack.push(model_trans);
-        mvstack.push(model_trans); // intentional, copy for drawTreeConnector() to throw away
-        drawTreeConnector(view_trans, 0.375, 0.125);
-    }
-    
-    // model tree sphere
-    model_trans = mvstack.pop();
-    model_trans *= Translate(0, 1, 0);
-    // mvstack.push(model_trans); // don't push here because we don't need to save tree transformation after this point
-    model_trans *= Scale(1.0);
-    model_view = view_trans * model_trans;
-    set_colour(0.8f, 0.0f, 0.0f);
-    drawSphere();
-    
-    // model bee body
-    model_trans = mvstack.pop();
-    if (beeZOffset == 0) {
-        
-        beeZOffset = 5.0;
-    }
-    model_trans *= Translate(beeXOffset, beeYOffset, beeZOffset);
-    model_trans *= RotateY(beeYRotationAngle);
-    mvstack.push(model_trans);
-    model_trans *= Scale(1.0, 0.5, 0.5);
-    model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(96), getRgbFloat(96), getRgbFloat(96));
-    drawCube(); 
-    
-    // model bee head
-    model_trans = mvstack.pop();
-    mvstack.push(model_trans);
-    model_trans *= Translate(-0.75, 0, 0);
-    model_trans *= Scale(0.25);
-    model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(101), getRgbFloat(70), getRgbFloat(128));
-    drawSphere();
-    
-    // model bee tail
-    model_trans = mvstack.pop();
-    mvstack.push(model_trans);
-    model_trans *= Translate(1.5, 0, 0);
-    model_trans *= Scale(1, 0.55, 0.45);
-    model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(204), getRgbFloat(204), getRgbFloat(0));
-    drawSphere();
-    
-    // 1 thing on stack at this point
-    
-    /* model bee legs */
-    model_trans = mvstack.pop();
-    mvstack.push(model_trans); // save copy of model_trans at bee body center
-    
-    mvstack.push(model_trans); // local copy of model_trans for bee leg transformations
-    drawLeg(view_trans);
-    model_trans = mvstack.pop();
-    mvstack.push(model_trans); // put bee body center trans back on stack
-    
-    model_trans *= Translate(-0.25, 0, 0);
-    mvstack.push(model_trans);
-    drawLeg(view_trans);
-    model_trans = mvstack.pop();
-    mvstack.push(model_trans); // put bee body center trans back on stack
-    
-    model_trans *= Translate(0.25, 0, 0);
-    mvstack.push(model_trans);
-    drawLeg(view_trans);
-    model_trans = mvstack.pop();
-    mvstack.push(model_trans); // put bee body center trans back on stack
-    
-    model_trans = mvstack.pop();
-    model_trans *= ReflectXY(); // Reflect over XY plane for other three bee legs
-    mvstack.push(model_trans);
-    
-    mvstack.push(model_trans);
-    drawLeg(view_trans);
-    model_trans = mvstack.pop();
-    mvstack.push(model_trans); // put bee body center trans back on stack
-    
-    model_trans *= Translate(-0.25, 0, 0);
-    mvstack.push(model_trans);
-    drawLeg(view_trans);
-    model_trans = mvstack.pop();
-    mvstack.push(model_trans); // put bee body center trans back on stack
-    
-    model_trans *= Translate(0.25, 0, 0);
-    mvstack.push(model_trans);
-    drawLeg(view_trans);
-    model_trans = mvstack.pop();
-    mvstack.push(model_trans); // put bee body center trans back on stack
-    
-    // model right bee wing
-    model_trans = mvstack.pop();
-    mvstack.push(model_trans);
-    if (beeYWingOffset == 0) {
-        
-        beeYWingOffset = 0.28125;
-    }
-    if (beeZWingOffset == 0) {
-        
-        beeZWingOffset = 1.0;
-    }
-    model_trans *= Translate(0, beeYWingOffset, beeZWingOffset);
-    model_trans *= RotateX(beeWingAngle);
-    model_trans *= Scale(0.5, 0.0625, 1.5);
-    model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(120), getRgbFloat(120), getRgbFloat(120));
-    drawCube();
-    
-    // model left bee wing
-    model_trans = mvstack.pop();
-    mvstack.push(model_trans);
-    model_trans *= Translate(0, beeYWingOffset, -beeZWingOffset);
-    model_trans *= RotateX(-beeWingAngle);
-    model_trans *= Scale(0.5, 0.0625, 1.5);
-    model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(120), getRgbFloat(120), getRgbFloat(120));
-    drawCube();
-    
-    model_trans = mvstack.pop(); // avoid stack overflow
+//    // model tree trunk
+//    for (int i=0; i < 8; i++) {
+//        
+//        float treeRotationAngleInRads = treeRotationAngle * i * DegreesToRadians;
+//        
+//        model_trans = mvstack.pop();
+//        model_trans *= Translate(-(0.375 * sin(treeRotationAngleInRads)), (0.375 + (0.375 * cos(treeRotationAngleInRads))), 0);
+//        model_trans *= RotateZ(treeRotationAngle * i);
+//        mvstack.push(model_trans);
+//        model_trans *= Scale(0.25, 0.75, 0.25);
+//        model_view = view_trans * model_trans;
+//        set_colour(getRgbFloat(160), getRgbFloat(82), getRgbFloat(45));
+//        drawCube();
+//        
+//        model_trans = mvstack.pop();
+//        mvstack.push(model_trans);
+//        mvstack.push(model_trans); // intentional, copy for drawTreeConnector() to throw away
+//        drawTreeConnector(view_trans, 0.375, 0.125);
+//    }
+//    
+//    // model tree sphere
+//    model_trans = mvstack.pop();
+//    model_trans *= Translate(0, 1, 0);
+//    // mvstack.push(model_trans); // don't push here because we don't need to save tree transformation after this point
+//    model_trans *= Scale(1.0);
+//    model_view = view_trans * model_trans;
+//    set_colour(0.8f, 0.0f, 0.0f);
+//    drawSphere();
+//    
+//    // model bee body
+//    model_trans = mvstack.pop();
+//    if (beeZOffset == 0) {
+//        
+//        beeZOffset = 5.0;
+//    }
+//    model_trans *= Translate(beeXOffset, beeYOffset, beeZOffset);
+//    model_trans *= RotateY(beeYRotationAngle);
+//    mvstack.push(model_trans);
+//    model_trans *= Scale(1.0, 0.5, 0.5);
+//    model_view = view_trans * model_trans;
+//    set_colour(getRgbFloat(96), getRgbFloat(96), getRgbFloat(96));
+//    drawCube(); 
+//    
+//    // model bee head
+//    model_trans = mvstack.pop();
+//    mvstack.push(model_trans);
+//    model_trans *= Translate(-0.75, 0, 0);
+//    model_trans *= Scale(0.25);
+//    model_view = view_trans * model_trans;
+//    set_colour(getRgbFloat(101), getRgbFloat(70), getRgbFloat(128));
+//    drawSphere();
+//    
+//    // model bee tail
+//    model_trans = mvstack.pop();
+//    mvstack.push(model_trans);
+//    model_trans *= Translate(1.5, 0, 0);
+//    model_trans *= Scale(1, 0.55, 0.45);
+//    model_view = view_trans * model_trans;
+//    set_colour(getRgbFloat(204), getRgbFloat(204), getRgbFloat(0));
+//    drawSphere();
+//    
+//    // 1 thing on stack at this point
+//    
+//    /* model bee legs */
+//    model_trans = mvstack.pop();
+//    mvstack.push(model_trans); // save copy of model_trans at bee body center
+//    
+//    mvstack.push(model_trans); // local copy of model_trans for bee leg transformations
+//    drawLeg(view_trans);
+//    model_trans = mvstack.pop();
+//    mvstack.push(model_trans); // put bee body center trans back on stack
+//    
+//    model_trans *= Translate(-0.25, 0, 0);
+//    mvstack.push(model_trans);
+//    drawLeg(view_trans);
+//    model_trans = mvstack.pop();
+//    mvstack.push(model_trans); // put bee body center trans back on stack
+//    
+//    model_trans *= Translate(0.25, 0, 0);
+//    mvstack.push(model_trans);
+//    drawLeg(view_trans);
+//    model_trans = mvstack.pop();
+//    mvstack.push(model_trans); // put bee body center trans back on stack
+//    
+//    model_trans = mvstack.pop();
+//    model_trans *= ReflectXY(); // Reflect over XY plane for other three bee legs
+//    mvstack.push(model_trans);
+//    
+//    mvstack.push(model_trans);
+//    drawLeg(view_trans);
+//    model_trans = mvstack.pop();
+//    mvstack.push(model_trans); // put bee body center trans back on stack
+//    
+//    model_trans *= Translate(-0.25, 0, 0);
+//    mvstack.push(model_trans);
+//    drawLeg(view_trans);
+//    model_trans = mvstack.pop();
+//    mvstack.push(model_trans); // put bee body center trans back on stack
+//    
+//    model_trans *= Translate(0.25, 0, 0);
+//    mvstack.push(model_trans);
+//    drawLeg(view_trans);
+//    model_trans = mvstack.pop();
+//    mvstack.push(model_trans); // put bee body center trans back on stack
+//    
+//    // model right bee wing
+//    model_trans = mvstack.pop();
+//    mvstack.push(model_trans);
+//    if (beeYWingOffset == 0) {
+//        
+//        beeYWingOffset = 0.28125;
+//    }
+//    if (beeZWingOffset == 0) {
+//        
+//        beeZWingOffset = 1.0;
+//    }
+//    model_trans *= Translate(0, beeYWingOffset, beeZWingOffset);
+//    model_trans *= RotateX(beeWingAngle);
+//    model_trans *= Scale(0.5, 0.0625, 1.5);
+//    model_view = view_trans * model_trans;
+//    set_colour(getRgbFloat(120), getRgbFloat(120), getRgbFloat(120));
+//    drawCube();
+//    
+//    // model left bee wing
+//    model_trans = mvstack.pop();
+//    mvstack.push(model_trans);
+//    model_trans *= Translate(0, beeYWingOffset, -beeZWingOffset);
+//    model_trans *= RotateX(-beeWingAngle);
+//    model_trans *= Scale(0.5, 0.0625, 1.5);
+//    model_view = view_trans * model_trans;
+//    set_colour(getRgbFloat(120), getRgbFloat(120), getRgbFloat(120));
+//    drawCube();
+//    
+//    model_trans = mvstack.pop(); // avoid stack overflow
     
 /**************************************************************
      Your drawing/modeling ends here
@@ -724,39 +724,39 @@ void idle(void)
         
         //Your code starts here
         
-        float cosTime = cos(TIME / TwoPI);
-        float sinTime = sin(TIME / TwoPI);
-        
-        // calculate bee offsets as a function of TIME
-        beeXOffset = - sinTime * 5;
-        beeYOffset = sin(fmod((TIME / TwoPI), 1.0) * TwoPI);
-        beeZOffset = cosTime * 5;
-        
-        // calculate bee Y Rotation Angle as a function of TIME
-        float d = TwoPI * TwoPI;
-        beeYRotationAngle = fmod((360.0 - (fmod((TIME / d), TwoPI)) * 360.0), 360);
-        
-        // calculate bee wing angle as a function of TIME
-        beeWingAngle = sin(fmod((TIME / TwoPI), 1.0) * TwoPI) * 45;
-        
-        // calculate bee wing offsets as a function of beeWingAngle
-        beeYWingOffset = 0.25 - (0.75 * sin(beeWingAngle * DegreesToRadians)) + (0.03125 * cos(beeWingAngle * DegreesToRadians));
-        beeZWingOffset = 0.25 + (0.75 * cos(beeWingAngle * DegreesToRadians)) + (0.03125 * sin(beeWingAngle * DegreesToRadians));
-        
-        // calculate bee leg angles as a funcion of TIME
-        beeUpperLegAngle = (((sin(fmod((TIME / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 10);
-        beeLowerLegAngle = (((sin(fmod((TIME / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 7.5);
-        
-        // calculate bee upper leg offsets as a function of beeUpperLegAngle
-        beeYUpperLegOffset = -0.25 - (0.25 * cos(beeUpperLegAngle * DegreesToRadians)) - (0.0625 * sin(beeUpperLegAngle * DegreesToRadians));
-        beeZUpperLegOffset = 0.25 - (0.25 * sin(beeUpperLegAngle * DegreesToRadians)) + (0.0625 * cos(beeUpperLegAngle * DegreesToRadians));
-        
-        // calculate bee lower leg offsets as a function of beeLowerLegAngle
-        beeYLowerLegOffset = -0.25 - (0.25 * cos(beeLowerLegAngle * DegreesToRadians)) - (0.0625 * sin(beeLowerLegAngle * DegreesToRadians));
-        beeZLowerLegOffset = -0.0625 - (0.25 * sin(beeLowerLegAngle * DegreesToRadians)) + (0.0625 * cos(beeLowerLegAngle * DegreesToRadians));
-        
-        // calculate tree rotation angle as a function of TIME
-        treeRotationAngle = sin(fmod(((TIME / TwoPI) / 4), 1.0) * TwoPI) * 1.0;
+//        float cosTime = cos(TIME / TwoPI);
+//        float sinTime = sin(TIME / TwoPI);
+//        
+//        // calculate bee offsets as a function of TIME
+//        beeXOffset = - sinTime * 5;
+//        beeYOffset = sin(fmod((TIME / TwoPI), 1.0) * TwoPI);
+//        beeZOffset = cosTime * 5;
+//        
+//        // calculate bee Y Rotation Angle as a function of TIME
+//        float d = TwoPI * TwoPI;
+//        beeYRotationAngle = fmod((360.0 - (fmod((TIME / d), TwoPI)) * 360.0), 360);
+//        
+//        // calculate bee wing angle as a function of TIME
+//        beeWingAngle = sin(fmod((TIME / TwoPI), 1.0) * TwoPI) * 45;
+//        
+//        // calculate bee wing offsets as a function of beeWingAngle
+//        beeYWingOffset = 0.25 - (0.75 * sin(beeWingAngle * DegreesToRadians)) + (0.03125 * cos(beeWingAngle * DegreesToRadians));
+//        beeZWingOffset = 0.25 + (0.75 * cos(beeWingAngle * DegreesToRadians)) + (0.03125 * sin(beeWingAngle * DegreesToRadians));
+//        
+//        // calculate bee leg angles as a funcion of TIME
+//        beeUpperLegAngle = (((sin(fmod((TIME / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 10);
+//        beeLowerLegAngle = (((sin(fmod((TIME / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 7.5);
+//        
+//        // calculate bee upper leg offsets as a function of beeUpperLegAngle
+//        beeYUpperLegOffset = -0.25 - (0.25 * cos(beeUpperLegAngle * DegreesToRadians)) - (0.0625 * sin(beeUpperLegAngle * DegreesToRadians));
+//        beeZUpperLegOffset = 0.25 - (0.25 * sin(beeUpperLegAngle * DegreesToRadians)) + (0.0625 * cos(beeUpperLegAngle * DegreesToRadians));
+//        
+//        // calculate bee lower leg offsets as a function of beeLowerLegAngle
+//        beeYLowerLegOffset = -0.25 - (0.25 * cos(beeLowerLegAngle * DegreesToRadians)) - (0.0625 * sin(beeLowerLegAngle * DegreesToRadians));
+//        beeZLowerLegOffset = -0.0625 - (0.25 * sin(beeLowerLegAngle * DegreesToRadians)) + (0.0625 * cos(beeLowerLegAngle * DegreesToRadians));
+//        
+//        // calculate tree rotation angle as a function of TIME
+//        treeRotationAngle = sin(fmod(((TIME / TwoPI) / 4), 1.0) * TwoPI) * 1.0;
 
         //Your code ends here
         
