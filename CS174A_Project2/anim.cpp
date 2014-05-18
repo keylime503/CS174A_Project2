@@ -554,8 +554,9 @@ void display(void)
     // model airplane fuselage
     model_trans = mvstack.pop();
     model_trans *= Translate(0, 2, 0);
-    model_trans *= RotateY(90);
+    // model_trans *= RotateY(90); // rotate entire plane y, gave me issues with mlg orientation
     mvstack.push(model_trans);
+    model_trans *= RotateY(90);
     model_trans *= Scale(1, 1, 5);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
@@ -564,7 +565,8 @@ void display(void)
     // model airplane nose
     model_trans = mvstack.pop();
     mvstack.push(model_trans); // don't need to save nose location
-    model_trans *= Translate(0, 0, 5);
+    model_trans *= Translate(5, 0, 0);
+    model_trans *= RotateY(90);
     model_trans *= Scale(1, 1, 2);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
@@ -573,7 +575,8 @@ void display(void)
     // model airplane fuselage cone
     model_trans = mvstack.pop();
     mvstack.push(model_trans); // don't need to save fuselage cone location
-    model_trans *= Translate(0, 0, -6);
+    model_trans *= Translate(-6, 0, 0);
+    model_trans *= RotateY(90);
     model_trans *= Scale(1, 1, 1);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
@@ -585,7 +588,6 @@ void display(void)
     model_trans *= Translate(0, -0.4, 0);
     mvstack.push(model_trans); // intentional 2nd push for left engine
     mvstack.push(model_trans); // intentional 2nd push for right engine
-    model_trans *= RotateY(90);
     // model_trans *= ShearXY(1.0); TODO: Incorporate shear to make wings into triangles
     model_trans *= Scale(1, 0.2, 8);
     model_view = view_trans * model_trans;
@@ -594,8 +596,9 @@ void display(void)
     
     // model left airplane engine
     model_trans = mvstack.pop();
-    model_trans *= Translate(2.5, -0.5, 0.2);
+    model_trans *= Translate(0.2, -0.5, -2.5);
     mvstack.push(model_trans);
+    model_trans *= RotateY(90);
     model_trans *= Scale(0.5, 0.5, 1);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
@@ -603,7 +606,8 @@ void display(void)
     
     // model left airplane engine cone
     model_trans = mvstack.pop();
-    model_trans *= Translate(0, 0, -2);
+    model_trans *= Translate(-2, 0, 0);
+    model_trans *= RotateY(90);
     model_trans *= Scale(0.5, 0.5, 1.0);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
@@ -611,8 +615,9 @@ void display(void)
     
     // model right airplane engine
     model_trans = mvstack.pop();
-    model_trans *= Translate(-2.5, -0.5, 0.2);
+    model_trans *= Translate(0.2, -0.5, 2.5);
     mvstack.push(model_trans);
+    model_trans *= RotateY(90);
     model_trans *= Scale(0.5, 0.5, 1);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
@@ -620,7 +625,8 @@ void display(void)
     
     // model right airplane engine cone
     model_trans = mvstack.pop();
-    model_trans *= Translate(0, 0, -2);
+    model_trans *= Translate(-2, 0, 0);
+    model_trans *= RotateY(90);
     model_trans *= Scale(0.5, 0.5, 1.0);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
@@ -629,8 +635,7 @@ void display(void)
     // model airplane elevator (back wing)
     model_trans = mvstack.pop();
     mvstack.push(model_trans); // save fuselage location
-    model_trans *= Translate(0, 0.4, -5.5);
-    model_trans *= RotateY(90);
+    model_trans *= Translate(-5.5, 0.4, 0);
     // model_trans *= ShearXY(1.0); TODO: Incorporate shear to make wings into triangles
     model_trans *= Scale(0.5, 0.2, 3);
     model_view = view_trans * model_trans;
@@ -640,10 +645,10 @@ void display(void)
     // model airplane tail
     model_trans = mvstack.pop();
     mvstack.push(model_trans); // save fuselage location
-    model_trans *= Translate(0, 0, -5);
-    model_trans *= ReflectXY();
-    model_trans *= ShearYZ(2.0);
-    model_trans *= Scale(0.2, 4, 2);
+    model_trans *= Translate(-5, 1.01, 0);
+    model_trans *= ReflectYZ();
+    model_trans *= ShearXY(0.75);
+    model_trans *= Scale(2, 4, 0.2);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
     drawCube();
