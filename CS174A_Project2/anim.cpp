@@ -91,10 +91,10 @@ float mlgUpperLegAngle;
 float mlgLowerLegAngle;
 //
 float mlgYUpperLegOffset;
-float mlgXUpperLegOffset;
+float mlgZUpperLegOffset;
 //
 float mlgYLowerLegOffset;
-float mlgXLowerLegOffset;
+float mlgZLowerLegOffset;
 //
 //float treeRotationAngle;
 
@@ -454,12 +454,12 @@ void drawMLG(mat4 view_trans) {
         
         mlgYUpperLegOffset = -1.5;
     }
-    if (mlgXUpperLegOffset == 0) {
+    if (mlgZUpperLegOffset == 0) {
         
-        mlgXUpperLegOffset = 0.3125;
+        mlgZUpperLegOffset = 0.3125;
     }
-    model_trans *= Translate(mlgXUpperLegOffset, mlgYUpperLegOffset, 0);
-    model_trans *= RotateZ(90 + mlgUpperLegAngle);
+    model_trans *= Translate(0, mlgYUpperLegOffset, mlgZUpperLegOffset);
+    model_trans *= RotateX(90 + mlgUpperLegAngle);
     mvstack.push(model_trans);
     model_trans *= Scale(0.125, 0.125, 0.5);
     model_view = view_trans * model_trans;
@@ -472,12 +472,12 @@ void drawMLG(mat4 view_trans) {
         
         mlgYLowerLegOffset = -0.5;
     }
-    if (mlgXLowerLegOffset == 0) {
+    if (mlgZLowerLegOffset == 0) {
         
-        mlgXLowerLegOffset = 0.0;
+        mlgZLowerLegOffset = 0.0;
     }
-    model_trans *= Translate(-mlgYLowerLegOffset, mlgXLowerLegOffset, 0);
-    model_trans *= RotateZ(mlgLowerLegAngle);
+    model_trans *= Translate(0, mlgZLowerLegOffset, -mlgYLowerLegOffset);
+    model_trans *= RotateX(mlgLowerLegAngle);
     model_trans *= Scale(0.125, 0.125, 0.5);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(255), getRgbFloat(255), getRgbFloat(255));
@@ -554,6 +554,7 @@ void display(void)
     // model airplane fuselage
     model_trans = mvstack.pop();
     model_trans *= Translate(0, 2, 0);
+    model_trans *= RotateY(90);
     mvstack.push(model_trans);
     model_trans *= Scale(1, 1, 5);
     model_view = view_trans * model_trans;
@@ -847,9 +848,9 @@ void idle(void)
         
         //Your code starts here
         
-//        float cosTime = cos(TIME / TwoPI);
-//        float sinTime = sin(TIME / TwoPI);
-//        
+        float cosTime = cos(TIME / TwoPI);
+        float sinTime = sin(TIME / TwoPI);
+        
 //        // calculate bee offsets as a function of TIME
 //        beeXOffset = - sinTime * 5;
 //        beeYOffset = sin(fmod((TIME / TwoPI), 1.0) * TwoPI);
@@ -866,18 +867,18 @@ void idle(void)
 //        beeYWingOffset = 0.25 - (0.75 * sin(beeWingAngle * DegreesToRadians)) + (0.03125 * cos(beeWingAngle * DegreesToRadians));
 //        beeZWingOffset = 0.25 + (0.75 * cos(beeWingAngle * DegreesToRadians)) + (0.03125 * sin(beeWingAngle * DegreesToRadians));
 //        
-//        // calculate bee leg angles as a funcion of TIME
-//        beeUpperLegAngle = (((sin(fmod((TIME / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 10);
-//        beeLowerLegAngle = (((sin(fmod((TIME / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 7.5);
-//        
-//        // calculate bee upper leg offsets as a function of beeUpperLegAngle
-//        beeYUpperLegOffset = -0.25 - (0.25 * cos(beeUpperLegAngle * DegreesToRadians)) - (0.0625 * sin(beeUpperLegAngle * DegreesToRadians));
-//        beeZUpperLegOffset = 0.25 - (0.25 * sin(beeUpperLegAngle * DegreesToRadians)) + (0.0625 * cos(beeUpperLegAngle * DegreesToRadians));
-//        
-//        // calculate bee lower leg offsets as a function of beeLowerLegAngle
-//        beeYLowerLegOffset = -0.25 - (0.25 * cos(beeLowerLegAngle * DegreesToRadians)) - (0.0625 * sin(beeLowerLegAngle * DegreesToRadians));
-//        beeZLowerLegOffset = -0.0625 - (0.25 * sin(beeLowerLegAngle * DegreesToRadians)) + (0.0625 * cos(beeLowerLegAngle * DegreesToRadians));
-//        
+        // calculate bee leg angles as a funcion of TIME
+        mlgUpperLegAngle = (((sin(fmod((TIME / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 10);
+        mlgLowerLegAngle = (((sin(fmod((TIME / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 7.5);
+        
+        // calculate bee upper leg offsets as a function of beeUpperLegAngle
+        mlgYUpperLegOffset = -0.25 - (0.25 * cos(mlgUpperLegAngle * DegreesToRadians)) - (0.0625 * sin(mlgUpperLegAngle * DegreesToRadians));
+        mlgZUpperLegOffset = 0.25 - (0.25 * sin(mlgUpperLegAngle * DegreesToRadians)) + (0.0625 * cos(mlgUpperLegAngle * DegreesToRadians));
+        
+        // calculate bee lower leg offsets as a function of beeLowerLegAngle
+        mlgYLowerLegOffset = -0.25 - (0.25 * cos(mlgLowerLegAngle * DegreesToRadians)) - (0.0625 * sin(mlgLowerLegAngle * DegreesToRadians));
+        mlgZLowerLegOffset = -0.0625 - (0.25 * sin(mlgLowerLegAngle * DegreesToRadians)) + (0.0625 * cos(mlgLowerLegAngle * DegreesToRadians));
+        
 //        // calculate tree rotation angle as a function of TIME
 //        treeRotationAngle = sin(fmod(((TIME / TwoPI) / 4), 1.0) * TwoPI) * 1.0;
 
