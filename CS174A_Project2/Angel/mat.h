@@ -709,6 +709,36 @@ mat4 ReflectXZ()
     c[1][1] = -1;
     return c;
 }
+    
+//----------------------------------------------------------------------------
+//
+//  Shear matrix generators
+//
+    
+inline
+mat4 ShearXY( const GLfloat shearConstant )
+{
+    mat4 c;
+    c[0][1] = shearConstant;
+    return c;
+}
+    
+inline
+mat4 ShearYZ( const GLfloat shearConstant )
+{
+    mat4 c;
+    c[1][2] = shearConstant;
+    return c;
+}
+    
+inline
+mat4 ShearXZ( const GLfloat shearConstant )
+{
+    mat4 c;
+    c[0][2] = shearConstant;
+    return c;
+}
+    
 
 //----------------------------------------------------------------------------
 //

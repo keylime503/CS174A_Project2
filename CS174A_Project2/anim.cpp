@@ -77,26 +77,26 @@ typedef char STR[STRLEN];
 //  TwoPi constant
 const GLfloat TwoPI = 2.0 * M_PI;
 
-float beeXOffset;
-float beeYOffset;
-float beeZOffset;
-
-float beeYRotationAngle;
-float beeWingAngle;
-
-float beeYWingOffset;
-float beeZWingOffset;
-
-float beeUpperLegAngle;
-float beeLowerLegAngle;
-
-float beeYUpperLegOffset;
-float beeZUpperLegOffset;
-
-float beeYLowerLegOffset;
-float beeZLowerLegOffset;
-
-float treeRotationAngle;
+//float beeXOffset;
+//float beeYOffset;
+//float beeZOffset;
+//
+//float beeYRotationAngle;
+//float beeWingAngle;
+//
+//float beeYWingOffset;
+//float beeZWingOffset;
+//
+float mlgUpperLegAngle;
+float mlgLowerLegAngle;
+//
+float mlgYUpperLegOffset;
+float mlgXUpperLegOffset;
+//
+float mlgYLowerLegOffset;
+float mlgXLowerLegOffset;
+//
+//float treeRotationAngle;
 
 //texture
 GLuint texture_cube;
@@ -445,57 +445,57 @@ void myReshape(int w, int h)
 }
 
 // net 1 pop on mvstack (pop, push, push, pop, pop)
-void drawLeg(mat4 view_trans) {
+void drawMLG(mat4 view_trans) {
     
-    // upper part of leg
+    // upper part of MLG
     mat4 model_trans = mvstack.pop();
     mvstack.push(model_trans); // intentional
-    if (beeYUpperLegOffset == 0) {
+    if (mlgYUpperLegOffset == 0) {
         
-        beeYUpperLegOffset = -0.5;
+        mlgYUpperLegOffset = -1.5;
     }
-    if (beeZUpperLegOffset == 0) {
+    if (mlgXUpperLegOffset == 0) {
         
-        beeZUpperLegOffset = 0.3125;
+        mlgXUpperLegOffset = 0.3125;
     }
-    model_trans *= Translate(0, beeYUpperLegOffset, beeZUpperLegOffset);
-    model_trans *= RotateX(90 + beeUpperLegAngle);
+    model_trans *= Translate(mlgXUpperLegOffset, mlgYUpperLegOffset, 0);
+    model_trans *= RotateZ(90 + mlgUpperLegAngle);
     mvstack.push(model_trans);
     model_trans *= Scale(0.125, 0.125, 0.5);
     model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(96), getRgbFloat(96), getRgbFloat(96));
+    set_colour(getRgbFloat(0), getRgbFloat(0), getRgbFloat(0));
     drawCube();
     
-    // lower part of leg
+    // lower part of MLG
     model_trans = mvstack.pop();
-    if (beeYLowerLegOffset == 0) {
+    if (mlgYLowerLegOffset == 0) {
         
-        beeYLowerLegOffset = -0.5;
+        mlgYLowerLegOffset = -0.5;
     }
-    if (beeZLowerLegOffset == 0) {
+    if (mlgXLowerLegOffset == 0) {
         
-        beeZLowerLegOffset = 0.0;
+        mlgXLowerLegOffset = 0.0;
     }
-    model_trans *= Translate(0, beeZLowerLegOffset, -beeYLowerLegOffset);
-    model_trans *= RotateX(beeLowerLegAngle);
+    model_trans *= Translate(-mlgYLowerLegOffset, mlgXLowerLegOffset, 0);
+    model_trans *= RotateZ(mlgLowerLegAngle);
     model_trans *= Scale(0.125, 0.125, 0.5);
     model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(96), getRgbFloat(96), getRgbFloat(96));
+    set_colour(getRgbFloat(255), getRgbFloat(255), getRgbFloat(255));
     drawCube();
     
-    mvstack.pop(); // get rid of the copy of model_trans meant for this specific leg
+    mvstack.pop(); // get rid of the copy of model_trans meant for this specific MLG
 }
 
 // net 1 pop on mvstack
-void drawTreeConnector(mat4 view_trans, float yOffset, float radius) {
-    
-    mat4 model_trans = mvstack.pop();
-    model_trans *= Translate(0, yOffset, 0);
-    model_trans *= Scale(radius, radius, radius);
-    model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(160), getRgbFloat(82), getRgbFloat(45));
-    drawSphere();
-}
+//void drawTreeConnector(mat4 view_trans, float yOffset, float radius) {
+//    
+//    mat4 model_trans = mvstack.pop();
+//    model_trans *= Translate(0, yOffset, 0);
+//    model_trans *= Scale(radius, radius, radius);
+//    model_view = view_trans * model_trans;
+//    set_colour(getRgbFloat(160), getRgbFloat(82), getRgbFloat(45));
+//    drawSphere();
+//}
 
 /*********************************************************
  **********************************************************
@@ -521,7 +521,7 @@ void display(void)
     mat4 model_trans(1.0f);
     mat4 view_trans(1.0f);
     
-    view_trans *= Translate(0.0f, 0.0f, -15.0f); //the same effect as zoom out
+    view_trans *= Translate(0.0f, 0.0f, -30.0f); //the same effect as zoom out
     
     // below deals with zoom in/out by mouse
     HMatrix r;
@@ -546,10 +546,133 @@ void display(void)
     // model ground plane
     model_trans *= Translate(0, -5, 0);
     mvstack.push(model_trans);
-    model_trans *= Scale(20, 0.25, 20);
+    model_trans *= Scale(100, 0.25, 100);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(131), getRgbFloat(181), getRgbFloat(106)); // forest green color
+//    drawCube();
+    
+    // model airplane fuselage
+    model_trans = mvstack.pop();
+    model_trans *= Translate(0, 2, 0);
+    mvstack.push(model_trans);
+    model_trans *= Scale(1, 1, 5);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
+    drawCylinder();
+    
+    // model airplane nose
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // don't need to save nose location
+    model_trans *= Translate(0, 0, 5);
+    model_trans *= Scale(1, 1, 2);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
+    drawSphere();
+    
+    // model airplane fuselage cone
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // don't need to save fuselage cone location
+    model_trans *= Translate(0, 0, -6);
+    model_trans *= Scale(1, 1, 1);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
+    drawCone();
+    
+    // model airplane wing
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // save fuselage location
+    model_trans *= Translate(0, -0.4, 0);
+    mvstack.push(model_trans); // intentional 2nd push for left engine
+    mvstack.push(model_trans); // intentional 2nd push for right engine
+    model_trans *= RotateY(90);
+    // model_trans *= ShearXY(1.0); TODO: Incorporate shear to make wings into triangles
+    model_trans *= Scale(1, 0.2, 8);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
+    drawCylinder();
+    
+    // model left airplane engine
+    model_trans = mvstack.pop();
+    model_trans *= Translate(2.5, -0.5, 0.2);
+    mvstack.push(model_trans);
+    model_trans *= Scale(0.5, 0.5, 1);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
+    drawCylinder();
+    
+    // model left airplane engine cone
+    model_trans = mvstack.pop();
+    model_trans *= Translate(0, 0, -2);
+    model_trans *= Scale(0.5, 0.5, 1.0);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
+    drawCone();
+    
+    // model right airplane engine
+    model_trans = mvstack.pop();
+    model_trans *= Translate(-2.5, -0.5, 0.2);
+    mvstack.push(model_trans);
+    model_trans *= Scale(0.5, 0.5, 1);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
+    drawCylinder();
+    
+    // model right airplane engine cone
+    model_trans = mvstack.pop();
+    model_trans *= Translate(0, 0, -2);
+    model_trans *= Scale(0.5, 0.5, 1.0);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
+    drawCone();
+    
+    // model airplane elevator (back wing)
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // save fuselage location
+    model_trans *= Translate(0, 0.4, -5.5);
+    model_trans *= RotateY(90);
+    // model_trans *= ShearXY(1.0); TODO: Incorporate shear to make wings into triangles
+    model_trans *= Scale(0.5, 0.2, 3);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
+    drawCylinder();
+    
+    // model airplane tail
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // save fuselage location
+    model_trans *= Translate(0, 0, -5);
+    model_trans *= ReflectXY();
+    model_trans *= ShearYZ(2.0);
+    model_trans *= Scale(0.2, 4, 2);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
     drawCube();
+    
+    // model airplane landing gear (front and back)
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // save fuselage location
+    
+    mvstack.push(model_trans); // local copy of model_trans for MLG transformations
+    drawMLG(view_trans);
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // put fuselage center trans back on stack
+    
+    model_trans = mvstack.pop();
+    model_trans *= ReflectYZ(); // Reflect over YZ plane for other MLG
+    mvstack.push(model_trans);
+    
+    mvstack.push(model_trans);
+    drawMLG(view_trans);
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // put fuselage center trans back on stack
+    
+    // TODO: model front landing gear (FLG)
+    
+    
+    // leave this here as long as each modeling chunk popped and pushed
+    model_trans = mvstack.pop();
+    
+    
+    
     
 //    // model tree trunk
 //    for (int i=0; i < 8; i++) {
@@ -683,8 +806,8 @@ void display(void)
 //    model_view = view_trans * model_trans;
 //    set_colour(getRgbFloat(120), getRgbFloat(120), getRgbFloat(120));
 //    drawCube();
-//    
-//    model_trans = mvstack.pop(); // avoid stack overflow
+    
+    model_trans = mvstack.pop(); // avoid stack overflow
     
 /**************************************************************
      Your drawing/modeling ends here
