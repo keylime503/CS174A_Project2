@@ -86,16 +86,24 @@ const GLfloat TwoPI = 2.0 * M_PI;
 //
 //float beeYWingOffset;
 //float beeZWingOffset;
-//
+
 float mlgUpperLegAngle;
 float mlgLowerLegAngle;
-//
+
 float mlgYUpperLegOffset;
 float mlgZUpperLegOffset;
-//
+
 float mlgYLowerLegOffset;
 float mlgZLowerLegOffset;
-//
+
+float flgUpperLegAngle;
+float flgLowerLegAngle;
+
+float flgYUpperLegOffset;
+
+float flgYLowerLegOffset;
+float flgZLowerLegOffset;
+
 //float treeRotationAngle;
 
 //texture
@@ -444,33 +452,118 @@ void myReshape(int w, int h)
     glUniformMatrix4fv( uProjection, 1, GL_TRUE, projection );
 }
 
-// net 1 pop on mvstack (pop, push, push, pop, pop)
+// not 1 pop on mvstack (pop)
+void drawFLGWheel(mat4 view_trans) {
+    
+    mat4 model_trans = mvstack.pop();
+    model_trans *= Translate(0, 0.2, 0);
+    model_trans *= RotateX(90);
+    model_trans *= Scale(0.2, 0.2, 0.1);
+    model_view = view_trans *= model_trans;
+    set_colour(getRgbFloat(32), getRgbFloat(32), getRgbFloat(32));
+    drawCylinder();
+}
+
+// net 1 pop on mvstack
+void drawFLG(mat4 view_trans) {
+    
+    // upper leg of FLG
+    mat4 model_trans = mvstack.pop();
+    mvstack.push(model_trans); // intentional
+    if (flgYUpperLegOffset == 0) {
+        
+        flgYUpperLegOffset = -0.8; // bee value : -0.5
+    }
+    model_trans *= Translate(0, flgYUpperLegOffset, 0);
+    model_trans *= RotateX(90 + flgUpperLegAngle);
+    mvstack.push(model_trans);
+    model_trans *= Scale(0.1, 0.1, 0.4); // bee value: 0.125, 0.125, 0.5
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(224), getRgbFloat(223), getRgbFloat(219)); // stainless steel color
+    drawCylinder();
+    
+    // lower leg of FLG
+    model_trans = mvstack.pop();
+    if (flgYLowerLegOffset == 0) {
+        
+        flgYLowerLegOffset = -0.8;
+    }
+    if (flgZLowerLegOffset == 0) {
+        
+        flgZLowerLegOffset = 0.0;
+    }
+    model_trans *= Translate(0, flgZLowerLegOffset, -flgYLowerLegOffset);
+    model_trans *= RotateX(flgLowerLegAngle);
+    mvstack.push(model_trans);
+    model_trans *= Scale(0.1, 0.1, 0.4);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(224), getRgbFloat(223), getRgbFloat(219)); // stainless steel color
+    drawCylinder();
+    
+    // FLG wheels
+    
+    model_trans = mvstack.pop(); // even # push/pops after this other than very last pop w/ comment
+    mvstack.push(model_trans); // save copy of model_trans
+    
+    model_trans *= Translate(0, 0, 0.5);
+    mvstack.push(model_trans); // local copy of model_trans for wheel transformations
+    drawFLGWheel(view_trans);
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // put wheel bar center trans back on stack
+    
+    model_trans = mvstack.pop();
+    model_trans *= ReflectXY(); // Reflect over XY plane for other three wheels
+    mvstack.push(model_trans);
+    
+    model_trans *= Translate(0, -0.4, -0.5);
+    mvstack.push(model_trans); // local copy of model_trans for wheel transformations
+    drawFLGWheel(view_trans);
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // put wheel bar center trans back on stack
+    
+    mvstack.pop(); // intentional
+    mvstack.pop(); // get rid of the copy of model_trans meant for this specific FLG
+}
+
+// net 1 pop on mvstack (pop)
+void drawMLGWheel(mat4 view_trans) {
+    
+    mat4 model_trans = mvstack.pop();
+    model_trans *= Translate(0, 0.2, 0);
+    model_trans *= RotateX(90);
+    model_trans *= Scale(0.2, 0.2, 0.1);
+    model_view = view_trans *= model_trans;
+    set_colour(getRgbFloat(32), getRgbFloat(32), getRgbFloat(32));
+    drawCylinder();
+}
+
+// net 1 pop on mvstack (pop, push, push, pop, push, pop, pop)
 void drawMLG(mat4 view_trans) {
     
-    // upper part of MLG
+    // upper leg of MLG
     mat4 model_trans = mvstack.pop();
     mvstack.push(model_trans); // intentional
     if (mlgYUpperLegOffset == 0) {
         
-        mlgYUpperLegOffset = -1.5;
+        mlgYUpperLegOffset = -0.8; // bee value : -0.5
     }
     if (mlgZUpperLegOffset == 0) {
         
-        mlgZUpperLegOffset = 0.3125;
+        mlgZUpperLegOffset = 1.0; // bee value :  0.3125
     }
     model_trans *= Translate(0, mlgYUpperLegOffset, mlgZUpperLegOffset);
     model_trans *= RotateX(90 + mlgUpperLegAngle);
     mvstack.push(model_trans);
-    model_trans *= Scale(0.125, 0.125, 0.5);
+    model_trans *= Scale(0.1, 0.1, 0.4); // bee value: 0.125, 0.125, 0.5
     model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(0), getRgbFloat(0), getRgbFloat(0));
-    drawCube();
+    set_colour(getRgbFloat(224), getRgbFloat(223), getRgbFloat(219)); // stainless steel color
+    drawCylinder();
     
-    // lower part of MLG
+    // lower leg of MLG
     model_trans = mvstack.pop();
     if (mlgYLowerLegOffset == 0) {
         
-        mlgYLowerLegOffset = -0.5;
+        mlgYLowerLegOffset = -0.8;
     }
     if (mlgZLowerLegOffset == 0) {
         
@@ -478,11 +571,67 @@ void drawMLG(mat4 view_trans) {
     }
     model_trans *= Translate(0, mlgZLowerLegOffset, -mlgYLowerLegOffset);
     model_trans *= RotateX(mlgLowerLegAngle);
-    model_trans *= Scale(0.125, 0.125, 0.5);
+    mvstack.push(model_trans);
+    model_trans *= Scale(0.1, 0.1, 0.4);
     model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(255), getRgbFloat(255), getRgbFloat(255));
-    drawCube();
+    set_colour(getRgbFloat(224), getRgbFloat(223), getRgbFloat(219));
+    drawCylinder();
     
+    // wheel bar of MLG
+    model_trans = mvstack.pop();
+    model_trans *= Translate(0, 0, 0.5);
+    mvstack.push(model_trans);
+    model_trans *= RotateY(90);
+    model_trans *= Scale(0.1, 0.1, 0.5);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(224), getRgbFloat(223), getRgbFloat(219));
+    drawCylinder();
+    
+    // MLG wheels
+    
+    model_trans = mvstack.pop(); // even # push/pops after this other than very last pop w/ comment
+    mvstack.push(model_trans); // save copy of model_trans at bee body center
+
+    mvstack.push(model_trans); // local copy of model_trans for wheel transformations
+    drawMLGWheel(view_trans);
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // put wheel bar center trans back on stack
+    
+    model_trans *= Translate(-0.4, 0, 0);
+    mvstack.push(model_trans); // local copy of model_trans for wheel transformations
+    drawMLGWheel(view_trans);
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // put wheel bar center trans back on stack
+    
+    model_trans *= Translate(0.4, 0, 0);
+    mvstack.push(model_trans); // local copy of model_trans for wheel transformations
+    drawMLGWheel(view_trans);
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // put wheel bar center trans back on stack
+    
+    model_trans = mvstack.pop();
+    model_trans *= ReflectXY(); // Reflect over XY plane for other three wheels
+    mvstack.push(model_trans);
+    
+    model_trans *= Translate(0, -0.4, 0);
+    mvstack.push(model_trans); // local copy of model_trans for wheel transformations
+    drawMLGWheel(view_trans);
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // put wheel bar center trans back on stack
+    
+    model_trans *= Translate(-0.4, -0.4, 0);
+    mvstack.push(model_trans); // local copy of model_trans for wheel transformations
+    drawMLGWheel(view_trans);
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // put wheel bar center trans back on stack
+    
+    model_trans *= Translate(0.4, -0.4, 0);
+    mvstack.push(model_trans); // local copy of model_trans for wheel transformations
+    drawMLGWheel(view_trans);
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // put wheel bar center trans back on stack
+
+    mvstack.pop(); // intentional
     mvstack.pop(); // get rid of the copy of model_trans meant for this specific MLG
 }
 
@@ -549,12 +698,11 @@ void display(void)
     model_trans *= Scale(100, 0.25, 100);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(131), getRgbFloat(181), getRgbFloat(106)); // forest green color
-//    drawCube();
+    drawCube();
     
     // model airplane fuselage
     model_trans = mvstack.pop();
-    model_trans *= Translate(0, 2, 0);
-    // model_trans *= RotateY(90); // rotate entire plane y, gave me issues with mlg orientation
+    model_trans *= Translate(0, 2.4, 0);
     mvstack.push(model_trans);
     model_trans *= RotateY(90);
     model_trans *= Scale(1, 1, 5);
@@ -653,7 +801,7 @@ void display(void)
     set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
     drawCube();
     
-    // model airplane landing gear (front and back)
+    // model MLG
     model_trans = mvstack.pop();
     mvstack.push(model_trans); // save fuselage location
     
@@ -663,7 +811,7 @@ void display(void)
     mvstack.push(model_trans); // put fuselage center trans back on stack
     
     model_trans = mvstack.pop();
-    model_trans *= ReflectYZ(); // Reflect over YZ plane for other MLG
+    model_trans *= ReflectXY(); // Reflect over XY plane for other MLG
     mvstack.push(model_trans);
     
     mvstack.push(model_trans);
@@ -671,14 +819,15 @@ void display(void)
     model_trans = mvstack.pop();
     mvstack.push(model_trans); // put fuselage center trans back on stack
     
-    // TODO: model front landing gear (FLG)
-    
+    // model FLG
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // save fuselage location
+    model_trans *= Translate(5.5, 0, 0);
+    mvstack.push(model_trans); // local copy of model_trans for FLG transformations
+    drawFLG(view_trans);
     
     // leave this here as long as each modeling chunk popped and pushed
     model_trans = mvstack.pop();
-    
-    
-    
     
 //    // model tree trunk
 //    for (int i=0; i < 8; i++) {
