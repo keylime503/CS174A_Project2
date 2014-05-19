@@ -77,13 +77,11 @@ typedef char STR[STRLEN];
 //  TwoPi constant
 const GLfloat TwoPI = 2.0 * M_PI;
 
+float mlgUpperLegAngle = 0.0;
+float mlgLowerLegAngle = 0.0;
 
-
-float mlgUpperLegAngle;
-float mlgLowerLegAngle;
-
-float flgUpperLegAngle;
-float flgLowerLegAngle;
+float flgUpperLegAngle = 0.0;
+float flgLowerLegAngle = 0.0;
 
 //texture
 GLuint texture_cube;
@@ -607,17 +605,6 @@ void drawMLG(mat4 view_trans) {
     mvstack.pop(); // get rid of the copy of model_trans meant for this specific MLG
 }
 
-// net 1 pop on mvstack
-//void drawTreeConnector(mat4 view_trans, float yOffset, float radius) {
-//    
-//    mat4 model_trans = mvstack.pop();
-//    model_trans *= Translate(0, yOffset, 0);
-//    model_trans *= Scale(radius, radius, radius);
-//    model_view = view_trans * model_trans;
-//    set_colour(getRgbFloat(160), getRgbFloat(82), getRgbFloat(45));
-//    drawSphere();
-//}
-
 /*********************************************************
  **********************************************************
  **********************************************************
@@ -642,7 +629,9 @@ void display(void)
     mat4 model_trans(1.0f);
     mat4 view_trans(1.0f);
     
-    view_trans *= Translate(0.0f, 0.0f, -20.0f); //the same effect as zoom out
+    view_trans *= LookAt(eye, ref, up);
+    
+    view_trans *= Translate(0.0f, 0.0f, 0.0f); //the same effect as zoom out
     
     // below deals with zoom in/out by mouse
     HMatrix r;
@@ -667,20 +656,43 @@ void display(void)
     // model ground plane
     model_trans *= Translate(0, -5, 0);
     mvstack.push(model_trans);
- 
-    /*model_trans *= Translate(5, 0, 0);
-    model_trans *= RotateZ(90);
-    model_trans *= Translate(-5, 0, 0);
-    model_trans *= Scale(10, 0.25, 10);*/
 
-    model_trans *= Scale(100, 0.25, 100);
+    model_trans *= Scale(1000, 0.25, 1000);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(131), getRgbFloat(181), getRgbFloat(106)); // forest green color
-    //drawCube();
+    drawCube();
+    
+    // model runway
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // save ground plane location for fuselage
+    model_trans *= Translate(45.0, 0.25, 0);
+    model_trans *= Scale(100.0, 0.1, 10.0);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(105), getRgbFloat(105), getRgbFloat(105)); // dim gray color
+    drawCube();
+    
+    // model control tower base
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // save ground plane location for fuselage
+    model_trans *= Translate(10.0, 5.0, -20.0);
+    mvstack.push(model_trans); // for top piece of control tower
+    model_trans *= Scale(2.0, 10.0, 2.0);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(210), getRgbFloat(180), getRgbFloat(140)); // tan building color
+    drawCube();
+    
+    // model control tower top
+    model_trans = mvstack.pop();
+    model_trans *= Translate(0, 5.0, 0);
+    model_trans *= RotateX(270);
+    model_trans *= Scale(2.0, 2.0, 2.0);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(70), getRgbFloat(130), getRgbFloat(180)); // steel blue color
+    drawCone();
     
     // model airplane fuselage
     model_trans = mvstack.pop();
-    model_trans *= Translate(0, 2.4, 0);
+    model_trans *= Translate(0, 2.5, 0);
     //model_trans *= RotateZ(15); // take-off
     //model_trans *= RotateX(10); // bank right
     mvstack.push(model_trans);
@@ -716,7 +728,6 @@ void display(void)
     model_trans *= Translate(0, -0.4, 0);
     mvstack.push(model_trans); // intentional 2nd push for left engine
     mvstack.push(model_trans); // intentional 2nd push for right engine
-    // model_trans *= ShearXY(1.0); TODO: Incorporate shear to make wings into triangles
     model_trans *= Scale(1, 0.2, 8);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
@@ -846,6 +857,12 @@ void idle(void)
             TIME += 0.033 ; // save at 30 frames per second.
         
         //Your code starts here
+        
+        // 360 degree camera fly-around using LookAt
+        if (TIME < TwoPI) {
+            
+            eye = vec4(30*cos(TIME), 10.0, 30*sin(TIME),1.0);
+        }
         
         // calculate LG angles as a funcion of TIME
         mlgUpperLegAngle = (((sin(fmod(((TIME / 2.0) / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 90);
