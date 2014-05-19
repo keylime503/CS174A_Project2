@@ -485,7 +485,7 @@ void drawFLG(mat4 view_trans) {
     mvstack.push(model_trans);
     model_trans *= Scale(0.1, 0.1, 0.3); // bee value: 0.125, 0.125, 0.5
     model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(224), getRgbFloat(0), getRgbFloat(0)); // stainless steel color
+    set_colour(getRgbFloat(224), getRgbFloat(223), getRgbFloat(219)); // stainless steel color
     drawCylinder();
     
     // lower leg of FLG
@@ -499,7 +499,11 @@ void drawFLG(mat4 view_trans) {
         flgZLowerLegOffset = 0.0;
     }
     model_trans *= Translate(0, flgZLowerLegOffset, -flgYLowerLegOffset);
-    model_trans *= RotateX(flgLowerLegAngle);
+    
+    model_trans *= Translate(0.05, 0, -0.3);
+    model_trans *= RotateY(flgLowerLegAngle);
+    model_trans *= Translate(-0.05, 0, 0.3);
+    
     mvstack.push(model_trans);
     model_trans *= Scale(0.1, 0.1, 0.3);
     model_view = view_trans * model_trans;
