@@ -452,13 +452,13 @@ void drawFLG(mat4 view_trans) {
     model_trans *= Translate(0, -1.2, 0);
     model_trans *= RotateX(90);
     
+    // rotation
     model_trans *= Translate(0, 0, -0.9);
     model_trans *= RotateY(-flgUpperLegAngle);
     model_trans *= Translate(0, 0, 0.9);
     
-    
     mvstack.push(model_trans);
-    model_trans *= Scale(0.1, 0.1, 0.3); // bee value: 0.125, 0.125, 0.5
+    model_trans *= Scale(0.1, 0.1, 0.3);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(224), getRgbFloat(223), getRgbFloat(219)); // stainless steel color
     drawCylinder();
@@ -467,6 +467,7 @@ void drawFLG(mat4 view_trans) {
     model_trans = mvstack.pop();
     model_trans *= Translate(0, 0, 0.6);
     
+    // rotation
     model_trans *= Translate(0.05, 0, -0.3);
     model_trans *= RotateY(flgLowerLegAngle);
     model_trans *= Translate(-0.05, 0, 0.3);
@@ -522,9 +523,14 @@ void drawMLG(mat4 view_trans) {
     mat4 model_trans = mvstack.pop();
     mvstack.push(model_trans); // intentional
     model_trans *= Translate(0, -0.8, 1.0);
-    model_trans *= RotateX(90 + mlgUpperLegAngle);
+    model_trans *= RotateX(90);
+    
+    model_trans *= Translate(0, -0.2, -0.1);
+    model_trans *= RotateX(-mlgUpperLegAngle);
+    model_trans *= Translate(0, 0.2, 0.1);
+    
     mvstack.push(model_trans);
-    model_trans *= Scale(0.1, 0.1, 0.4); // bee value: 0.125, 0.125, 0.5
+    model_trans *= Scale(0.1, 0.1, 0.4);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(224), getRgbFloat(223), getRgbFloat(219)); // stainless steel color
     drawCylinder();
@@ -532,7 +538,11 @@ void drawMLG(mat4 view_trans) {
     // lower leg of MLG
     model_trans = mvstack.pop();
     model_trans *= Translate(0, 0, 0.8);
+    
+    model_trans *= Translate(0, -0.1, -0.4);
     model_trans *= RotateX(mlgLowerLegAngle);
+    model_trans *= Translate(0, 0.1, 0.4);
+    
     mvstack.push(model_trans);
     model_trans *= Scale(0.1, 0.1, 0.4);
     model_view = view_trans * model_trans;
@@ -552,7 +562,7 @@ void drawMLG(mat4 view_trans) {
     // MLG wheels
     
     model_trans = mvstack.pop(); // even # push/pops after this other than very last pop w/ comment
-    mvstack.push(model_trans); // save copy of model_trans at bee body center
+    mvstack.push(model_trans); // save copy of model_trans at fuselage center
 
     mvstack.push(model_trans); // local copy of model_trans for wheel transformations
     drawMLGWheel(view_trans);
@@ -838,8 +848,8 @@ void idle(void)
         //Your code starts here
         
         // calculate LG angles as a funcion of TIME
-        mlgUpperLegAngle = (((sin(fmod(((TIME / 2.0) / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 10);
-        mlgLowerLegAngle = (((sin(fmod(((TIME / 2.0) / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 7.5);
+        mlgUpperLegAngle = (((sin(fmod(((TIME / 2.0) / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 90);
+        mlgLowerLegAngle = (((sin(fmod(((TIME / 2.0) / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 180);
         flgUpperLegAngle = (((sin(fmod(((TIME / 2.0) / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 90);
         flgLowerLegAngle = (((sin(fmod(((TIME / 2.0) / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 180);
 
