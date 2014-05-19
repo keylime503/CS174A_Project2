@@ -83,6 +83,10 @@ float mlgLowerLegAngle = 0.0;
 float flgUpperLegAngle = 0.0;
 float flgLowerLegAngle = 0.0;
 
+float xPosPlane = 0.0;
+float yPosPlane = 0.0;
+float zPosPlane = 0.0;
+
 //texture
 GLuint texture_cube;
 GLuint texture_earth;
@@ -684,15 +688,35 @@ void display(void)
     // model control tower top
     model_trans = mvstack.pop();
     model_trans *= Translate(0, 5.0, 0);
+    //mvstack.push(model_trans); // save control tower top for pole
     model_trans *= RotateX(270);
     model_trans *= Scale(2.0, 2.0, 2.0);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(70), getRgbFloat(130), getRgbFloat(180)); // steel blue color
     drawCone();
     
+//    // model control tower pole
+//    model_trans = mvstack.pop();
+//    model_trans *= Translate(0, 3.0, 0);
+//    mvstack.push(model_trans); // save pole location for wind cone
+//    model_trans *= RotateX(90);
+//    model_trans *= Scale(0.1, 0.1, 1.0);
+//    model_view = view_trans * model_trans;
+//    set_colour(getRgbFloat(224), getRgbFloat(223), getRgbFloat(219)); // stainless steel color
+//    drawCylinder();
+//    
+//    // model control tower wind cone
+//    model_trans = mvstack.pop();
+//    model_trans *= Translate(-0.6, 1.0, 0);
+//    model_trans *= RotateY(90);
+//    model_trans *= Scale(0.5, 0.25, 0.5);
+//    model_view = view_trans * model_trans;
+//    set_colour(getRgbFloat(255), getRgbFloat(69), getRgbFloat(0)); // orange wind cone color
+//    drawCone();
+    
     // model airplane fuselage
     model_trans = mvstack.pop();
-    model_trans *= Translate(0, 2.5, 0);
+    model_trans *= Translate(xPosPlane, 2.5 + yPosPlane, zPosPlane);
     //model_trans *= RotateZ(15); // take-off
     //model_trans *= RotateX(10); // bank right
     mvstack.push(model_trans);
@@ -858,10 +882,14 @@ void idle(void)
         
         //Your code starts here
         
-        // 360 degree camera fly-around using LookAt
         if (TIME < TwoPI) {
             
+            // 360 degree camera fly-around using LookAt
             eye = vec4(30*cos(TIME), 10.0, 30*sin(TIME),1.0);
+        } else {
+            
+            // Take-off
+            xPosPlane += 1.0 / 30.0;
         }
         
         // calculate LG angles as a funcion of TIME
