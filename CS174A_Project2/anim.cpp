@@ -475,7 +475,13 @@ void drawFLG(mat4 view_trans) {
         flgYUpperLegOffset = -1.2; // bee value : -0.5
     }
     model_trans *= Translate(0, flgYUpperLegOffset, 0);
-    model_trans *= RotateX(90 + flgUpperLegAngle);
+    model_trans *= RotateX(90);
+    
+    model_trans *= Translate(0, 0, -0.9);
+    model_trans *= RotateY(-flgUpperLegAngle);
+    model_trans *= Translate(0, 0, 0.9);
+    
+    
     mvstack.push(model_trans);
     model_trans *= Scale(0.1, 0.1, 0.3); // bee value: 0.125, 0.125, 0.5
     model_view = view_trans * model_trans;
@@ -671,7 +677,7 @@ void display(void)
     mat4 model_trans(1.0f);
     mat4 view_trans(1.0f);
     
-    view_trans *= Translate(0.0f, 0.0f, -30.0f); //the same effect as zoom out
+    view_trans *= Translate(0.0f, 0.0f, -20.0f); //the same effect as zoom out
     
     // below deals with zoom in/out by mouse
     HMatrix r;
@@ -696,14 +702,22 @@ void display(void)
     // model ground plane
     model_trans *= Translate(0, -5, 0);
     mvstack.push(model_trans);
+ 
+    /*model_trans *= Translate(5, 0, 0);
+    model_trans *= RotateZ(90);
+    model_trans *= Translate(-5, 0, 0);
+    model_trans *= Scale(10, 0.25, 10);*/
+
     model_trans *= Scale(100, 0.25, 100);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(131), getRgbFloat(181), getRgbFloat(106)); // forest green color
-    drawCube();
+    //drawCube();
     
     // model airplane fuselage
     model_trans = mvstack.pop();
     model_trans *= Translate(0, 2.4, 0);
+    //model_trans *= RotateZ(15); // take-off
+    //model_trans *= RotateX(10); // bank right
     mvstack.push(model_trans);
     model_trans *= RotateY(90);
     model_trans *= Scale(1, 1, 5);
@@ -1022,9 +1036,11 @@ void idle(void)
 //        beeYWingOffset = 0.25 - (0.75 * sin(beeWingAngle * DegreesToRadians)) + (0.03125 * cos(beeWingAngle * DegreesToRadians));
 //        beeZWingOffset = 0.25 + (0.75 * cos(beeWingAngle * DegreesToRadians)) + (0.03125 * sin(beeWingAngle * DegreesToRadians));
 //        
-        // calculate bee leg angles as a funcion of TIME
+        // calculate lg angles as a funcion of TIME
         mlgUpperLegAngle = (((sin(fmod((TIME / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 10);
         mlgLowerLegAngle = (((sin(fmod((TIME / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 7.5);
+        flgUpperLegAngle = (((sin(fmod((TIME / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 90);
+        flgLowerLegAngle = (((sin(fmod((TIME / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 180);
         
         // calculate bee upper leg offsets as a function of beeUpperLegAngle
         mlgYUpperLegOffset = -0.25 - (0.25 * cos(mlgUpperLegAngle * DegreesToRadians)) - (0.0625 * sin(mlgUpperLegAngle * DegreesToRadians));
