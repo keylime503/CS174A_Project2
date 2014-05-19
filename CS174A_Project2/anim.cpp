@@ -472,21 +472,21 @@ void drawFLG(mat4 view_trans) {
     mvstack.push(model_trans); // intentional
     if (flgYUpperLegOffset == 0) {
         
-        flgYUpperLegOffset = -0.8; // bee value : -0.5
+        flgYUpperLegOffset = -1.2; // bee value : -0.5
     }
     model_trans *= Translate(0, flgYUpperLegOffset, 0);
     model_trans *= RotateX(90 + flgUpperLegAngle);
     mvstack.push(model_trans);
-    model_trans *= Scale(0.1, 0.1, 0.4); // bee value: 0.125, 0.125, 0.5
+    model_trans *= Scale(0.1, 0.1, 0.3); // bee value: 0.125, 0.125, 0.5
     model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(224), getRgbFloat(223), getRgbFloat(219)); // stainless steel color
+    set_colour(getRgbFloat(224), getRgbFloat(0), getRgbFloat(0)); // stainless steel color
     drawCylinder();
     
     // lower leg of FLG
     model_trans = mvstack.pop();
     if (flgYLowerLegOffset == 0) {
         
-        flgYLowerLegOffset = -0.8;
+        flgYLowerLegOffset = -0.6;
     }
     if (flgZLowerLegOffset == 0) {
         
@@ -495,7 +495,7 @@ void drawFLG(mat4 view_trans) {
     model_trans *= Translate(0, flgZLowerLegOffset, -flgYLowerLegOffset);
     model_trans *= RotateX(flgLowerLegAngle);
     mvstack.push(model_trans);
-    model_trans *= Scale(0.1, 0.1, 0.4);
+    model_trans *= Scale(0.1, 0.1, 0.3);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(224), getRgbFloat(223), getRgbFloat(219)); // stainless steel color
     drawCylinder();
@@ -505,7 +505,7 @@ void drawFLG(mat4 view_trans) {
     model_trans = mvstack.pop(); // even # push/pops after this other than very last pop w/ comment
     mvstack.push(model_trans); // save copy of model_trans
     
-    model_trans *= Translate(0, 0, 0.5);
+    model_trans *= Translate(0, 0, 0.3);
     mvstack.push(model_trans); // local copy of model_trans for wheel transformations
     drawFLGWheel(view_trans);
     model_trans = mvstack.pop();
@@ -515,11 +515,12 @@ void drawFLG(mat4 view_trans) {
     model_trans *= ReflectXY(); // Reflect over XY plane for other three wheels
     mvstack.push(model_trans);
     
-    model_trans *= Translate(0, -0.4, -0.5);
+    model_trans *= Translate(0, -0.4, -0.3);
     mvstack.push(model_trans); // local copy of model_trans for wheel transformations
     drawFLGWheel(view_trans);
     model_trans = mvstack.pop();
     mvstack.push(model_trans); // put wheel bar center trans back on stack
+    
     
     mvstack.pop(); // intentional
     mvstack.pop(); // get rid of the copy of model_trans meant for this specific FLG
