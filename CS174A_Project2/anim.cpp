@@ -97,10 +97,10 @@ float tTakeoff = TwoPI;
 float tPitch = 10.0;
 float tLift = 12.0;
 float t30 = 15.0;
-float tGearUpStart = 20.0;
-float tGearUpEnd = 25.0;
-float tStartLevelOff = 27.0;
-float tEndLevelOff = 30.0;
+float tGearUpStart = 17.0;
+float tGearUpEnd = 20.0;
+float tStartLevelOff = 21.0;
+float tEndLevelOff = 25.0;
 
 //texture
 GLuint texture_cube;
@@ -905,15 +905,27 @@ void idle(void)
             // 360 degree camera fly-around using LookAt
             eye = vec4(30*cos(TIME + (PI / 2.0)), 10.0, 30*sin(TIME + (PI / 2.0)),1.0);
         
-        } else if (TIME < tEndLevelOff) { // t30
+        } else if (TIME < t30) {
             
             // Look at takeoff roll
-            eye = vec4(50.0, 10.0, 150.0, 1.0); // TODO, put the z back to 60.0
+            eye = vec4(-25.0, 5.0, 15.0, 1.0);
             ref = vec4(50.0, 0.0, 0.0, 1.0);
         
+        } else if (TIME < tGearUpEnd) {
+            
+            // Look at undercarriage
+            eye = vec4(160.0, 1.0, 14.0, 1.0);
+            ref = vec4(100.0, 20.0, -50.0, 1.0);
+            
+        } else if (TIME < tEndLevelOff) {
+
+            // Look at level-off
+            eye = vec4(200.0, 15.0, 100.0, 1.0);
+            ref = vec4(205.0, 12.0, 0.0, 1.0);
+            
         } else {
             
-            eye = vec4(200.0, 10.0, 30.0, 1.0);
+            eye = vec4(400.0, 10.0, 30.0, 1.0);
             ref = vec4(0.0, 0.0, 0.0, 1.0);
             
         }
@@ -971,28 +983,20 @@ void idle(void)
         } else if (TIME < tStartLevelOff) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
-            yPosPlane += 0.2 / 30.0;
-            
-            planePitchAngle = 30.0 - (fmod((TIME - tStartLevelOff), pitchDownTime) / pitchDownTime) * 30.0;
+            yPosPlane += 0.4 / 30.0;
             
         } else if (TIME < tEndLevelOff) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            yPosPlane += 0.2 / 30.0;
             
-            planePitchAngle = 0.0;
+            planePitchAngle = 30.0 - (fmod((TIME - tStartLevelOff), pitchDownTime) / pitchDownTime) * 30.0;
             
         } else {
             
-            /*xPosPlane =
-            yPosPlane =
-            zPosPlane =
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
             
-            planePitchAngle =
-            planeRollAngle =
-            
-            planeVelocity =
-            planeAccel =*/
-            
+            planePitchAngle = 0.0;
         }
         
         /******************************/
@@ -1016,9 +1020,9 @@ void idle(void)
             // TODO: Gear Down Time
             
             mlgUpperLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 90.0;
-            mlgLowerLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 1800.0;
+            mlgLowerLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 180.0;
             flgUpperLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 90.0;
-            flgLowerLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 1800.0;
+            flgLowerLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 180.0;
             
         } else { // TODO: change back to else if (TIME < tGearDownStart)
             
