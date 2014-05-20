@@ -87,6 +87,21 @@ float xPosPlane = 0.0;
 float yPosPlane = 0.0;
 float zPosPlane = 0.0;
 
+float planePitchAngle = 0.0;
+float planeRollAngle = 0.0;
+
+float planeVelocity = 0.0;
+float planeAccel = 0.0;
+
+float tTakeoff = TwoPI;
+float tPitch = 10.0;
+float tLift = 12.0;
+float t30 = 15.0;
+float tGearUpStart = 20.0;
+float tGearUpEnd = 25.0;
+float tStartLevelOff = 27.0;
+float tEndLevelOff = 30.0;
+
 //texture
 GLuint texture_cube;
 GLuint texture_earth;
@@ -716,9 +731,9 @@ void display(void)
     
     // model airplane fuselage
     model_trans = mvstack.pop();
-    model_trans *= Translate(xPosPlane, 2.5 + yPosPlane, zPosPlane);
-    //model_trans *= RotateZ(15); // take-off
-    //model_trans *= RotateX(10); // bank right
+    model_trans *= Translate(xPosPlane, 2.65 + yPosPlane, zPosPlane);
+    model_trans *= RotateZ(planePitchAngle); // pitch
+    model_trans *= RotateX(planeRollAngle); // roll
     mvstack.push(model_trans);
     model_trans *= RotateY(90);
     model_trans *= Scale(1, 1, 5);
@@ -882,21 +897,150 @@ void idle(void)
         
         //Your code starts here
         
-        if (TIME < TwoPI) {
+        /******************************/
+        /****** Camera Animation ******/
+        /******************************/
+        if (TIME < tTakeoff) {
             
             // 360 degree camera fly-around using LookAt
-            eye = vec4(30*cos(TIME), 10.0, 30*sin(TIME),1.0);
+            eye = vec4(30*cos(TIME + (PI / 2.0)), 10.0, 30*sin(TIME + (PI / 2.0)),1.0);
+        
+        } else if (TIME < tEndLevelOff) { // t30
+            
+            // Look at takeoff roll
+            eye = vec4(50.0, 10.0, 150.0, 1.0); // TODO, put the z back to 60.0
+            ref = vec4(50.0, 0.0, 0.0, 1.0);
+        
         } else {
             
-            // Take-off
-            xPosPlane += 1.0 / 30.0;
+            eye = vec4(200.0, 10.0, 30.0, 1.0);
+            ref = vec4(0.0, 0.0, 0.0, 1.0);
+            
+        }
+
+        
+        /******************************/
+        /****** Plane Animation *******/
+        /******************************/
+        
+        float pitchUpTime = t30 - tPitch;
+        float pitchDownTime = tEndLevelOff - tStartLevelOff;
+        
+        if (TIME < tTakeoff) {
+
+            // nothing to change here, everything should be 0.0
+            
+        } else if (TIME < tPitch) {
+            
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            
+            planePitchAngle = 0.0;
+            planeVelocity = planeVelocity + planeAccel * TIME;
+            planeAccel = 0.000001;
+            
+        } else if (TIME < tLift) {
+            
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            
+            planePitchAngle = (fmod((TIME - tPitch), pitchUpTime) / pitchUpTime) * 30.0;
+            
+            planeVelocity = planeVelocity + planeAccel * TIME;
+            
+        } else if (TIME < t30) {
+            
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            yPosPlane += 0.2 / 30.0;
+            
+            planePitchAngle = (fmod((TIME - tPitch), pitchUpTime) / pitchUpTime) * 30.0;
+            
+            planeVelocity = planeVelocity + planeAccel * TIME;
+            planeAccel = 0.0;
+            
+        } else if (TIME < tGearUpStart) {
+            
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            yPosPlane += 0.5 / 30.0;
+            
+            planePitchAngle = 30.0;
+            
+        } else if (TIME < tGearUpEnd) {
+            
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            yPosPlane += 0.5 / 30.0;
+            
+        } else if (TIME < tStartLevelOff) {
+            
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            yPosPlane += 0.2 / 30.0;
+            
+            planePitchAngle = 30.0 - (fmod((TIME - tStartLevelOff), pitchDownTime) / pitchDownTime) * 30.0;
+            
+        } else if (TIME < tEndLevelOff) {
+            
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            
+            planePitchAngle = 0.0;
+            
+        } else {
+            
+            /*xPosPlane =
+            yPosPlane =
+            zPosPlane =
+            
+            planePitchAngle =
+            planeRollAngle =
+            
+            planeVelocity =
+            planeAccel =*/
+            
         }
         
+        /******************************/
+        /*** Landing Gear Animation ***/
+        /******************************/
+        
         // calculate LG angles as a funcion of TIME
-        mlgUpperLegAngle = (((sin(fmod(((TIME / 2.0) / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 90);
-        mlgLowerLegAngle = (((sin(fmod(((TIME / 2.0) / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 180);
-        flgUpperLegAngle = (((sin(fmod(((TIME / 2.0) / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 90);
-        flgLowerLegAngle = (((sin(fmod(((TIME / 2.0) / TwoPI), 1.0) * TwoPI) + 1.0) / 2.0) * 180);
+        if (TIME < tGearUpStart) {
+            
+            // Landing Gear Down
+            mlgUpperLegAngle = 0.0;
+            mlgLowerLegAngle = 0.0;
+            flgUpperLegAngle = 0.0;
+            flgLowerLegAngle = 0.0;
+            
+        } else if (TIME < tGearUpEnd) {
+            
+            // Bring up landing gear
+            
+            float gearUpTime = tGearUpEnd - tGearUpStart;
+            // TODO: Gear Down Time
+            
+            mlgUpperLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 90.0;
+            mlgLowerLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 1800.0;
+            flgUpperLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 90.0;
+            flgLowerLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 1800.0;
+            
+        } else { // TODO: change back to else if (TIME < tGearDownStart)
+            
+            // Landing Gear Up
+            mlgUpperLegAngle = 90.0;
+            mlgLowerLegAngle = 180.0;
+            flgUpperLegAngle = 90.0;
+            flgLowerLegAngle = 180.0;
+            
+//        } else if (TIME < 45.0) {
+//            
+//            // Bring down landing gear
+//            
+//        } else {
+//            
+//            // Landing Gear Down
+//            mlgUpperLegAngle = 0.0;
+//            mlgLowerLegAngle = 0.0;
+//            flgUpperLegAngle = 0.0;
+//            flgLowerLegAngle = 0.0;
+        }
+       
 
         //Your code ends here
         
