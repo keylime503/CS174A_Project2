@@ -1173,7 +1173,6 @@ void idle(void)
         //Your code ends here
         
         printf("TIME %f\n", TIME) ;
-        printf("xPosPlane %f\n", xPosPlane); // TODO: remove this
         glutPostRedisplay() ;
     }
 }
