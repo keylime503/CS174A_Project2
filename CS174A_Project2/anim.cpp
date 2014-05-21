@@ -101,13 +101,15 @@ float tGearUpStart = 22.0;
 float tGearUpEnd = 25.0;
 float tStartLevelOff = 30.0;
 float tEndLevelOff = 34.0;
-float tStartTurn = 35.0;
-float tEndTurn = 36.0;
-float tStartDescent = 37.0;
-float tGearDownStart = 40.0;
-float tGearDownEnd = 43.0;
-float tTouchdown = 50.0;
-float tEnd = 55.0;
+float tStartTurnRight = 36.0;
+float tEndTurnRight = 38.0;
+float tStartTurnLeft = 40.0;
+float tEndTurnLeft = 42.0;
+float tStartDescent = 44.0;
+float tGearDownStart = 47.0;
+float tGearDownEnd = 50.0;
+float tTouchdown = 55.0;
+float tEnd = 60.0;
 
 //texture
 GLuint texture_cube;
@@ -726,7 +728,7 @@ void display(void)
     
     // model ground plane
     model_trans = mvstack.pop();
-    model_trans *= Translate(1000, -5, 0);
+    model_trans *= Translate(1200, -5, 0);
     mvstack.push(model_trans); // save ground plane for runway and control tower
     model_trans *= Scale(500, 0.25, 100);
     model_view = view_trans * model_trans;
@@ -736,7 +738,7 @@ void display(void)
     // model runway
     model_trans = mvstack.pop();
     mvstack.push(model_trans); // save ground plane location for control tower base
-    model_trans *= Translate(70.0, 0.25, 0);
+    model_trans *= Translate(150.0, 0.25, 0);
     model_trans *= Scale(150.0, 0.1, 10.0);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(105), getRgbFloat(105), getRgbFloat(105)); // dim gray color
@@ -744,7 +746,7 @@ void display(void)
     
     // model control tower base
     model_trans = mvstack.pop();
-    model_trans *= Translate(10.0, 5.0, -20.0);
+    model_trans *= Translate(90.0, 5.0, -20.0);
     mvstack.push(model_trans); // for top piece of control tower
     model_trans *= Scale(2.0, 10.0, 2.0);
     model_view = view_trans * model_trans;
@@ -970,6 +972,8 @@ void idle(void)
         
         float pitchUpTime = t30 - tPitch;
         float pitchDownTime = tEndLevelOff - tStartLevelOff;
+        float rollRightTime = tEndTurnRight - tStartTurnRight;
+        float rollLeftTime = tEndTurnLeft - tStartTurnLeft;
         
         if (TIME < tTakeoff) {
 
@@ -1027,45 +1031,57 @@ void idle(void)
             
             planePitchAngle = 15.0 - (fmod((TIME - tStartLevelOff), pitchDownTime) / pitchDownTime) * 15.0;
             
-        } else if (TIME < tStartTurn) {
+        } else if (TIME < tStartTurnRight) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
             
             planePitchAngle = 0.0;
         
-        } else if (TIME < tEndTurn) {
+        } else if (TIME < tEndTurnRight) {
         
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0); // TODO: change for turning parametric 180 DEGREES FOR TURN SO THAT NO Z-CHANGES NEEDED AFTER TURN
-            zPosPlane = zPosPlane; // TODO: change for turning parametric
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
             
-            planeRollAngle = 0.0; // TODO: change for turning
+            planeRollAngle = (fmod((TIME - tStartTurnRight), rollRightTime) / rollRightTime) * 15.0;
             
+        } else if (TIME < tStartTurnLeft) {
+            
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+
+            planeRollAngle = 15.0 - (fmod((TIME - tEndTurnRight), rollRightTime) / rollRightTime) * 15.0;
+            
+        } else if (TIME < tEndTurnLeft) {
+        
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+
+            planeRollAngle = (fmod((TIME - tStartTurnLeft), rollLeftTime) / rollLeftTime) * -15.0;
+        
         } else if (TIME < tStartDescent) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0); // TODO: change velocity and/or acceleration for orientation of plane after turn?
-            zPosPlane = zPosPlane; // TODO: change for turning parametric
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
             
-            planeRollAngle = 0.0;
+            planeRollAngle = -15.0 - (fmod((TIME - tEndTurnLeft), rollLeftTime) / rollLeftTime) * -15.0;
             
         } else if (TIME < tTouchdown) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0); // TODO: change velocity and/or acceleration for orientation of plane after turn?
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
             yPosPlane -= 0.8 / 30.0;
             
-            planeVelocity = planeVelocity + planeAccel * TIME; // TODO: should be in opposite direction now, negative value?
+            planeRollAngle = 0.0;
+            
+            planeVelocity = planeVelocity + planeAccel * TIME;
             
         } else if (TIME < tEnd) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0); // TODO: change velocity and/or acceleration for orientation of plane after turn?
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
             yPosPlane = 0.0; // touchdown
             
-            planeVelocity = planeVelocity + planeAccel * TIME; // TODO: should be in opposite direction now, negative value?
-            planeAccel = -0.000001; // TODO: confirm the sign of this and velocity since moving in negative x direction
+            planeVelocity = planeVelocity + planeAccel * TIME;
+            planeAccel = -0.000001;
             
             
         } else {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0); // TODO: change velocity and/or acceleration for orientation of plane after turn?
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
             
             planeVelocity = 0.0;
             planeAccel = 0.0;
