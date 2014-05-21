@@ -737,7 +737,7 @@ void display(void)
         model_trans = mvstack.pop();
         model_trans *= Translate(1250, -5, 0);
         mvstack.push(model_trans); // save ground plane for runway and control tower
-        model_trans *= Scale(500, 0.25, 100);
+        model_trans *= Scale(650, 0.25, 100);
         model_view = view_trans * model_trans;
         set_colour(getRgbFloat(131), getRgbFloat(181), getRgbFloat(106)); // forest green color
         drawCube();
@@ -746,7 +746,7 @@ void display(void)
         model_trans = mvstack.pop();
         mvstack.push(model_trans); // save ground plane location for control tower base
         model_trans *= Translate(150.0, 0.25, 0);
-        model_trans *= Scale(190.0, 0.1, 10.0);
+        model_trans *= Scale(220.0, 0.1, 10.0);
         model_view = view_trans * model_trans;
         set_colour(getRgbFloat(105), getRgbFloat(105), getRgbFloat(105)); // dim gray color
         drawCube();
