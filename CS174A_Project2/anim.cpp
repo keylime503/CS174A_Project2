@@ -101,14 +101,15 @@ float tGearUpStart = 22.0;
 float tGearUpEnd = 25.0;
 float tStartLevelOff = 30.0;
 float tEndLevelOff = 34.0;
-float tStartTurnRight = 36.0;
-float tEndTurnRight = 38.0;
+float tStartTurnRight = 35.0;
+float tEndTurnRight = 37.0;
+float tFlat = 39.0;
 float tStartTurnLeft = 40.0;
 float tEndTurnLeft = 42.0;
 float tStartDescent = 44.0;
 float tGearDownStart = 47.0;
 float tGearDownEnd = 50.0;
-float tTouchdown = 55.0;
+float tTouchdown = 55.5;
 float tEnd = 60.0;
 
 //texture
@@ -688,7 +689,11 @@ void display(void)
     // model ground plane
     model_trans *= Translate(0, -5, 0);
     mvstack.push(model_trans); // save ground plane for fuselage
-    mvstack.push(model_trans); // save ground plane for destination airport modeling
+    if (TIME > tEndTurnLeft) {
+    
+        mvstack.push(model_trans); // save ground plane for destination airport modeling
+    
+    }
     model_trans *= Scale(500, 0.25, 500);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(131), getRgbFloat(181), getRgbFloat(106)); // forest green color
@@ -726,41 +731,45 @@ void display(void)
     /****** Model Destination Airport ******/
     /***************************************/
     
-    // model ground plane
-    model_trans = mvstack.pop();
-    model_trans *= Translate(1200, -5, 0);
-    mvstack.push(model_trans); // save ground plane for runway and control tower
-    model_trans *= Scale(500, 0.25, 100);
-    model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(131), getRgbFloat(181), getRgbFloat(106)); // forest green color
-    drawCube();
+    if (TIME > tEndTurnLeft) {
     
-    // model runway
-    model_trans = mvstack.pop();
-    mvstack.push(model_trans); // save ground plane location for control tower base
-    model_trans *= Translate(150.0, 0.25, 0);
-    model_trans *= Scale(150.0, 0.1, 10.0);
-    model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(105), getRgbFloat(105), getRgbFloat(105)); // dim gray color
-    drawCube();
-    
-    // model control tower base
-    model_trans = mvstack.pop();
-    model_trans *= Translate(90.0, 5.0, -20.0);
-    mvstack.push(model_trans); // for top piece of control tower
-    model_trans *= Scale(2.0, 10.0, 2.0);
-    model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(210), getRgbFloat(180), getRgbFloat(140)); // tan building color
-    drawCube();
-    
-    // model control tower top
-    model_trans = mvstack.pop();
-    model_trans *= Translate(0, 5.0, 0);
-    model_trans *= RotateX(270);
-    model_trans *= Scale(2.0, 2.0, 2.0);
-    model_view = view_trans * model_trans;
-    set_colour(getRgbFloat(70), getRgbFloat(130), getRgbFloat(180)); // steel blue color
-    drawCone();
+        // model ground plane
+        model_trans = mvstack.pop();
+        model_trans *= Translate(1250, -5, 0);
+        mvstack.push(model_trans); // save ground plane for runway and control tower
+        model_trans *= Scale(500, 0.25, 100);
+        model_view = view_trans * model_trans;
+        set_colour(getRgbFloat(131), getRgbFloat(181), getRgbFloat(106)); // forest green color
+        drawCube();
+        
+        // model runway
+        model_trans = mvstack.pop();
+        mvstack.push(model_trans); // save ground plane location for control tower base
+        model_trans *= Translate(150.0, 0.25, 0);
+        model_trans *= Scale(190.0, 0.1, 10.0);
+        model_view = view_trans * model_trans;
+        set_colour(getRgbFloat(105), getRgbFloat(105), getRgbFloat(105)); // dim gray color
+        drawCube();
+        
+        // model control tower base
+        model_trans = mvstack.pop();
+        model_trans *= Translate(90.0, 5.0, -20.0);
+        mvstack.push(model_trans); // for top piece of control tower
+        model_trans *= Scale(2.0, 10.0, 2.0);
+        model_view = view_trans * model_trans;
+        set_colour(getRgbFloat(210), getRgbFloat(180), getRgbFloat(140)); // tan building color
+        drawCube();
+        
+        // model control tower top
+        model_trans = mvstack.pop();
+        model_trans *= Translate(0, 5.0, 0);
+        model_trans *= RotateX(270);
+        model_trans *= Scale(2.0, 2.0, 2.0);
+        model_view = view_trans * model_trans;
+        set_colour(getRgbFloat(70), getRgbFloat(130), getRgbFloat(180)); // steel blue color
+        drawCone();
+        
+    }
     
     /***************************************/
     /*********** Model Airplane ************/
@@ -1043,11 +1052,17 @@ void idle(void)
             
             planeRollAngle = (fmod((TIME - tStartTurnRight), rollRightTime) / rollRightTime) * 15.0;
             
+        } else if (TIME < tFlat) {
+        
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+
+            planeRollAngle = 15.0 - (fmod((TIME - tEndTurnRight), rollRightTime) / rollRightTime) * 15.0;
+            
         } else if (TIME < tStartTurnLeft) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
 
-            planeRollAngle = 15.0 - (fmod((TIME - tEndTurnRight), rollRightTime) / rollRightTime) * 15.0;
+            planeRollAngle = 0.0;
             
         } else if (TIME < tEndTurnLeft) {
         
@@ -1073,11 +1088,13 @@ void idle(void)
         } else if (TIME < tEnd) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
-            yPosPlane = 0.0; // touchdown
+            // yPosPlane = 0.0; // touchdown
             
-            planeVelocity = planeVelocity + planeAccel * TIME;
-            planeAccel = -0.000001;
+            if (planeVelocity > 0.0) {
             
+                planeVelocity = planeVelocity + planeAccel * TIME;
+                planeAccel = -0.0000005;
+            }
             
         } else {
             
