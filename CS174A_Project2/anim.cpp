@@ -704,8 +704,8 @@ void display(void)
     // model runway
     model_trans = mvstack.pop();
     mvstack.push(model_trans); // save ground plane location for fuselage
-    model_trans *= Translate(70.0, 0.25, 0);
-    model_trans *= Scale(150.0, 0.1, 10.0);
+    model_trans *= Translate(95.0, 0.25, 0);
+    model_trans *= Scale(200.0, 0.1, 10.0);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(105), getRgbFloat(105), getRgbFloat(105)); // dim gray color
     drawCube();
@@ -737,7 +737,7 @@ void display(void)
     
         // model ground plane
         model_trans = mvstack.pop();
-        model_trans *= Translate(1300, -5, 0);
+        model_trans *= Translate(1400, -5, 0);
         mvstack.push(model_trans); // save ground plane for runway and control tower
         model_trans *= Scale(800, 0.25, 100);
         model_view = view_trans * model_trans;
@@ -961,7 +961,7 @@ void idle(void)
         } else if (TIME < tGearUpEnd) {
             
             // Look at undercarriage
-            eye = vec4(230.0, 1.0, 14.0, 1.0);
+            eye = vec4(250.0, 1.0, 14.0, 1.0);
             ref = vec4(120.0, 20.0, -50.0, 1.0);
             
         } else if (TIME < tEndLevelOff + 1.0) {
@@ -999,7 +999,7 @@ void idle(void)
         float rollRightTime = tEndTurnRight - tStartTurnRight;
         float rollLeftTime = tEndTurnLeft - tStartTurnLeft;
         
-        float nFramesPassed = (TIME - prevTime) / 0.033; // try 0.011?
+        float nFramesPassed = (TIME - prevTime) / 0.011; // try 0.011?
         
         if (TIME < tTakeoff) {
 
@@ -1007,114 +1007,114 @@ void idle(void)
             
         } else if (TIME < tPitch) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
             
             planePitchAngle = 0.0;
-            planeVelocity = planeVelocity + planeAccel * TIME;
+            planeVelocity = planeVelocity + planeAccel * TIME * nFramesPassed;
             planeAccel = 0.000001;
             
         } else if (TIME < tLift) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
             
-            planePitchAngle = (fmod((TIME - tPitch), pitchUpTime) / pitchUpTime) * 30.0;
+            planePitchAngle = (fmod((TIME - tPitch), pitchUpTime) / pitchUpTime) * 20.0;
             
-            planeVelocity = planeVelocity + planeAccel * TIME;
+            planeVelocity = planeVelocity + planeAccel * TIME * nFramesPassed;
             
         } else if (TIME < t30) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);            
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
             yPosPlane += (0.2 / 30.0) * nFramesPassed;
             
-            planePitchAngle = (fmod((TIME - tPitch), pitchUpTime) / pitchUpTime) * 30.0;
+            planePitchAngle = (fmod((TIME - tPitch), pitchUpTime) / pitchUpTime) * 20.0;
             
-            planeVelocity = planeVelocity + planeAccel * TIME;
+            planeVelocity = planeVelocity + planeAccel * TIME * nFramesPassed;
             planeAccel = 0.0;
             
         } else if (TIME < tGearUpStart) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
             yPosPlane += (0.8 / 30.0) * nFramesPassed;
             
-            planePitchAngle = 30.0;
+            planePitchAngle = 20.0;
             
         } else if (TIME < tGearUpEnd) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
             yPosPlane += (0.8 / 30.0) * nFramesPassed;
             
         } else if (TIME < tStartLevelOff) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
             yPosPlane += (0.4 / 30.0) * nFramesPassed;
             
             planePitchAngle = 15.0;
             
         } else if (TIME < tEndLevelOff) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
             yPosPlane += (0.2 / 30.0) * nFramesPassed;
             
             planePitchAngle = 15.0 - (fmod((TIME - tStartLevelOff), pitchDownTime) / pitchDownTime) * 15.0;
             
         } else if (TIME < tStartTurnRight) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
             
             planePitchAngle = 0.0;
         
         } else if (TIME < tEndTurnRight) {
         
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
             
             planeRollAngle = (fmod((TIME - tStartTurnRight), rollRightTime) / rollRightTime) * 15.0;
             
         } else if (TIME < tFlat) {
         
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
 
             planeRollAngle = 15.0 - (fmod((TIME - tEndTurnRight), rollRightTime) / rollRightTime) * 15.0;
             
         } else if (TIME < tStartTurnLeft) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
 
             planeRollAngle = 0.0;
             
         } else if (TIME < tEndTurnLeft) {
         
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
 
             planeRollAngle = (fmod((TIME - tStartTurnLeft), rollLeftTime) / rollLeftTime) * -15.0;
         
         } else if (TIME < tStartDescent) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
             
             planeRollAngle = -15.0 - (fmod((TIME - tEndTurnLeft), rollLeftTime) / rollLeftTime) * -15.0;
             
         } else if (TIME < tTouchdown) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
             yPosPlane -= (0.8 / 30.0) * nFramesPassed;
             
             planeRollAngle = 0.0;
             
-            planeVelocity = planeVelocity + planeAccel * TIME;
+            planeVelocity = planeVelocity + planeAccel * TIME * nFramesPassed;
             
         } else if (TIME < tEnd) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
             
             if (planeVelocity > 0.0) {
             
-                planeVelocity = planeVelocity + planeAccel * TIME;
+                planeVelocity = planeVelocity + planeAccel * TIME * nFramesPassed;
                 planeAccel = -0.0000005;
             }
             
         } else {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
+            xPosPlane = xPosPlane + planeVelocity * TIME * nFramesPassed + 0.5 * planeAccel * pow(TIME * nFramesPassed, 2.0);
             
             planeVelocity = 0.0;
             planeAccel = 0.0;
