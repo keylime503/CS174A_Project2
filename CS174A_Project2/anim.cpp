@@ -94,13 +94,20 @@ float planeVelocity = 0.0;
 float planeAccel = 0.0;
 
 float tTakeoff = TwoPI;
-float tPitch = 10.0;
-float tLift = 12.0;
-float t30 = 15.0;
-float tGearUpStart = 17.0;
-float tGearUpEnd = 20.0;
-float tStartLevelOff = 21.0;
-float tEndLevelOff = 25.0;
+float tPitch = 15.0;
+float tLift = 17.0;
+float t30 = 20.0;
+float tGearUpStart = 22.0;
+float tGearUpEnd = 25.0;
+float tStartLevelOff = 30.0;
+float tEndLevelOff = 34.0;
+float tStartTurn = 35.0;
+float tEndTurn = 36.0;
+float tStartDescent = 37.0;
+float tGearDownStart = 40.0;
+float tGearDownEnd = 43.0;
+float tTouchdown = 50.0;
+float tEnd = 55.0;
 
 //texture
 GLuint texture_cube;
@@ -672,11 +679,15 @@ void display(void)
    Your drawing/modeling starts here
 ***************************************************************/
     
+    /***************************************/
+    /******* Model Departure Airport *******/
+    /***************************************/
+    
     // model ground plane
     model_trans *= Translate(0, -5, 0);
-    mvstack.push(model_trans);
-
-    model_trans *= Scale(1000, 0.25, 1000);
+    mvstack.push(model_trans); // save ground plane for fuselage
+    mvstack.push(model_trans); // save ground plane for destination airport modeling
+    model_trans *= Scale(500, 0.25, 500);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(131), getRgbFloat(181), getRgbFloat(106)); // forest green color
     drawCube();
@@ -684,8 +695,8 @@ void display(void)
     // model runway
     model_trans = mvstack.pop();
     mvstack.push(model_trans); // save ground plane location for fuselage
-    model_trans *= Translate(45.0, 0.25, 0);
-    model_trans *= Scale(100.0, 0.1, 10.0);
+    model_trans *= Translate(70.0, 0.25, 0);
+    model_trans *= Scale(150.0, 0.1, 10.0);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(105), getRgbFloat(105), getRgbFloat(105)); // dim gray color
     drawCube();
@@ -703,31 +714,55 @@ void display(void)
     // model control tower top
     model_trans = mvstack.pop();
     model_trans *= Translate(0, 5.0, 0);
-    //mvstack.push(model_trans); // save control tower top for pole
     model_trans *= RotateX(270);
     model_trans *= Scale(2.0, 2.0, 2.0);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(70), getRgbFloat(130), getRgbFloat(180)); // steel blue color
     drawCone();
     
-//    // model control tower pole
-//    model_trans = mvstack.pop();
-//    model_trans *= Translate(0, 3.0, 0);
-//    mvstack.push(model_trans); // save pole location for wind cone
-//    model_trans *= RotateX(90);
-//    model_trans *= Scale(0.1, 0.1, 1.0);
-//    model_view = view_trans * model_trans;
-//    set_colour(getRgbFloat(224), getRgbFloat(223), getRgbFloat(219)); // stainless steel color
-//    drawCylinder();
-//    
-//    // model control tower wind cone
-//    model_trans = mvstack.pop();
-//    model_trans *= Translate(-0.6, 1.0, 0);
-//    model_trans *= RotateY(90);
-//    model_trans *= Scale(0.5, 0.25, 0.5);
-//    model_view = view_trans * model_trans;
-//    set_colour(getRgbFloat(255), getRgbFloat(69), getRgbFloat(0)); // orange wind cone color
-//    drawCone();
+    /***************************************/
+    /****** Model Destination Airport ******/
+    /***************************************/
+    
+    // model ground plane
+    model_trans = mvstack.pop();
+    model_trans *= Translate(1000, -5, 0);
+    mvstack.push(model_trans); // save ground plane for runway and control tower
+    model_trans *= Scale(500, 0.25, 100);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(131), getRgbFloat(181), getRgbFloat(106)); // forest green color
+    drawCube();
+    
+    // model runway
+    model_trans = mvstack.pop();
+    mvstack.push(model_trans); // save ground plane location for control tower base
+    model_trans *= Translate(70.0, 0.25, 0);
+    model_trans *= Scale(150.0, 0.1, 10.0);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(105), getRgbFloat(105), getRgbFloat(105)); // dim gray color
+    drawCube();
+    
+    // model control tower base
+    model_trans = mvstack.pop();
+    model_trans *= Translate(10.0, 5.0, -20.0);
+    mvstack.push(model_trans); // for top piece of control tower
+    model_trans *= Scale(2.0, 10.0, 2.0);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(210), getRgbFloat(180), getRgbFloat(140)); // tan building color
+    drawCube();
+    
+    // model control tower top
+    model_trans = mvstack.pop();
+    model_trans *= Translate(0, 5.0, 0);
+    model_trans *= RotateX(270);
+    model_trans *= Scale(2.0, 2.0, 2.0);
+    model_view = view_trans * model_trans;
+    set_colour(getRgbFloat(70), getRgbFloat(130), getRgbFloat(180)); // steel blue color
+    drawCone();
+    
+    /***************************************/
+    /*********** Model Airplane ************/
+    /***************************************/
     
     // model airplane fuselage
     model_trans = mvstack.pop();
@@ -814,7 +849,6 @@ void display(void)
     model_trans = mvstack.pop();
     mvstack.push(model_trans); // save fuselage location
     model_trans *= Translate(-5.5, 0.4, 0);
-    // model_trans *= ShearXY(1.0); TODO: Incorporate shear to make wings into triangles
     model_trans *= Scale(0.5, 0.2, 3);
     model_view = view_trans * model_trans;
     set_colour(getRgbFloat(173), getRgbFloat(178), getRgbFloat(189)); // aluminum fuselage color
@@ -905,7 +939,7 @@ void idle(void)
             // 360 degree camera fly-around using LookAt
             eye = vec4(30*cos(TIME + (PI / 2.0)), 10.0, 30*sin(TIME + (PI / 2.0)),1.0);
         
-        } else if (TIME < t30) {
+        } else if (TIME < t30 + 1.0) {
             
             // Look at takeoff roll
             eye = vec4(-25.0, 5.0, 15.0, 1.0);
@@ -914,22 +948,21 @@ void idle(void)
         } else if (TIME < tGearUpEnd) {
             
             // Look at undercarriage
-            eye = vec4(160.0, 1.0, 14.0, 1.0);
-            ref = vec4(100.0, 20.0, -50.0, 1.0);
+            eye = vec4(230.0, 1.0, 14.0, 1.0);
+            ref = vec4(120.0, 20.0, -50.0, 1.0);
             
-        } else if (TIME < tEndLevelOff) {
+        } else if (TIME < tEndLevelOff + 1.0) {
 
             // Look at level-off
-            eye = vec4(200.0, 15.0, 100.0, 1.0);
-            ref = vec4(205.0, 12.0, 0.0, 1.0);
+            eye = vec4(200.0, 1.0, 17.0, 1.0);
+            ref = vec4(280.0, 24.0, 0.0, 1.0);
             
         } else {
             
-            eye = vec4(400.0, 10.0, 30.0, 1.0);
-            ref = vec4(0.0, 0.0, 0.0, 1.0);
-            
+            // Just look at the plane from the ground
+            eye = vec4(xPosPlane, yPosPlane, zPosPlane + 50, 1.0);
+            ref = vec4(xPosPlane, yPosPlane, 1.0, 1.0);
         }
-
         
         /******************************/
         /****** Plane Animation *******/
@@ -971,32 +1004,72 @@ void idle(void)
         } else if (TIME < tGearUpStart) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
-            yPosPlane += 0.5 / 30.0;
+            yPosPlane += 0.8 / 30.0;
             
             planePitchAngle = 30.0;
             
         } else if (TIME < tGearUpEnd) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
-            yPosPlane += 0.5 / 30.0;
+            yPosPlane += 0.8 / 30.0;
             
         } else if (TIME < tStartLevelOff) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
             yPosPlane += 0.4 / 30.0;
             
+            planePitchAngle = 15.0;
+            
         } else if (TIME < tEndLevelOff) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
             yPosPlane += 0.2 / 30.0;
             
-            planePitchAngle = 30.0 - (fmod((TIME - tStartLevelOff), pitchDownTime) / pitchDownTime) * 30.0;
+            planePitchAngle = 15.0 - (fmod((TIME - tStartLevelOff), pitchDownTime) / pitchDownTime) * 15.0;
             
-        } else {
+        } else if (TIME < tStartTurn) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
             
             planePitchAngle = 0.0;
+        
+        } else if (TIME < tEndTurn) {
+        
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0); // TODO: change for turning parametric 180 DEGREES FOR TURN SO THAT NO Z-CHANGES NEEDED AFTER TURN
+            zPosPlane = zPosPlane; // TODO: change for turning parametric
+            
+            planeRollAngle = 0.0; // TODO: change for turning
+            
+        } else if (TIME < tStartDescent) {
+            
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0); // TODO: change velocity and/or acceleration for orientation of plane after turn?
+            zPosPlane = zPosPlane; // TODO: change for turning parametric
+            
+            planeRollAngle = 0.0;
+            
+        } else if (TIME < tTouchdown) {
+            
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0); // TODO: change velocity and/or acceleration for orientation of plane after turn?
+            yPosPlane -= 0.8 / 30.0;
+            
+            planeVelocity = planeVelocity + planeAccel * TIME; // TODO: should be in opposite direction now, negative value?
+            
+        } else if (TIME < tEnd) {
+            
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0); // TODO: change velocity and/or acceleration for orientation of plane after turn?
+            yPosPlane = 0.0; // touchdown
+            
+            planeVelocity = planeVelocity + planeAccel * TIME; // TODO: should be in opposite direction now, negative value?
+            planeAccel = -0.000001; // TODO: confirm the sign of this and velocity since moving in negative x direction
+            
+            
+        } else {
+            
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0); // TODO: change velocity and/or acceleration for orientation of plane after turn?
+            
+            planeVelocity = 0.0;
+            planeAccel = 0.0;
+            
         }
         
         /******************************/
@@ -1017,14 +1090,13 @@ void idle(void)
             // Bring up landing gear
             
             float gearUpTime = tGearUpEnd - tGearUpStart;
-            // TODO: Gear Down Time
             
             mlgUpperLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 90.0;
             mlgLowerLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 180.0;
             flgUpperLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 90.0;
             flgLowerLegAngle = (fmod((TIME - tGearUpStart), gearUpTime) / gearUpTime) * 180.0;
             
-        } else { // TODO: change back to else if (TIME < tGearDownStart)
+        } else if (TIME < tGearDownStart) {
             
             // Landing Gear Up
             mlgUpperLegAngle = 90.0;
@@ -1032,23 +1104,30 @@ void idle(void)
             flgUpperLegAngle = 90.0;
             flgLowerLegAngle = 180.0;
             
-//        } else if (TIME < 45.0) {
-//            
-//            // Bring down landing gear
-//            
-//        } else {
-//            
-//            // Landing Gear Down
-//            mlgUpperLegAngle = 0.0;
-//            mlgLowerLegAngle = 0.0;
-//            flgUpperLegAngle = 0.0;
-//            flgLowerLegAngle = 0.0;
+        } else if (TIME < tGearDownEnd) {
+            
+            // Bring down landing gear
+            
+            float gearDownTime = tGearDownEnd - tGearDownStart;
+            
+            mlgUpperLegAngle = 90.0 - (fmod((TIME - tGearDownStart), gearDownTime) / gearDownTime) * 90.0;
+            mlgLowerLegAngle = 180.0 - (fmod((TIME - tGearDownStart), gearDownTime) / gearDownTime) * 180.0;
+            flgUpperLegAngle = 90.0 - (fmod((TIME - tGearDownStart), gearDownTime) / gearDownTime) * 90.0;
+            flgLowerLegAngle = 180.0 - (fmod((TIME - tGearDownStart), gearDownTime) / gearDownTime) * 180.0;
+
+        } else {
+            
+            // Landing Gear Down
+            mlgUpperLegAngle = 0.0;
+            mlgLowerLegAngle = 0.0;
+            flgUpperLegAngle = 0.0;
+            flgLowerLegAngle = 0.0;
         }
-       
 
         //Your code ends here
         
         printf("TIME %f\n", TIME) ;
+        printf("xPosPlane %f\n", xPosPlane); // TODO: remove this
         glutPostRedisplay() ;
     }
 }
