@@ -112,6 +112,8 @@ float tGearDownEnd = 50.0;
 float tTouchdown = 55.0;
 float tEnd = 60.0;
 
+float prevTime = 0.0;
+
 //texture
 GLuint texture_cube;
 GLuint texture_earth;
@@ -997,6 +999,8 @@ void idle(void)
         float rollRightTime = tEndTurnRight - tStartTurnRight;
         float rollLeftTime = tEndTurnLeft - tStartTurnLeft;
         
+        float nFramesPassed = (TIME - prevTime) / 0.033; // try 0.011?
+        
         if (TIME < tTakeoff) {
 
             // nothing to change here, everything should be 0.0
@@ -1019,8 +1023,8 @@ void idle(void)
             
         } else if (TIME < t30) {
             
-            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
-            yPosPlane += 0.2 / 30.0;
+            xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);            
+            yPosPlane += (0.2 / 30.0) * nFramesPassed;
             
             planePitchAngle = (fmod((TIME - tPitch), pitchUpTime) / pitchUpTime) * 30.0;
             
@@ -1030,26 +1034,26 @@ void idle(void)
         } else if (TIME < tGearUpStart) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
-            yPosPlane += 0.8 / 30.0;
+            yPosPlane += (0.8 / 30.0) * nFramesPassed;
             
             planePitchAngle = 30.0;
             
         } else if (TIME < tGearUpEnd) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
-            yPosPlane += 0.8 / 30.0;
+            yPosPlane += (0.8 / 30.0) * nFramesPassed;
             
         } else if (TIME < tStartLevelOff) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
-            yPosPlane += 0.4 / 30.0;
+            yPosPlane += (0.4 / 30.0) * nFramesPassed;
             
             planePitchAngle = 15.0;
             
         } else if (TIME < tEndLevelOff) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
-            yPosPlane += 0.2 / 30.0;
+            yPosPlane += (0.2 / 30.0) * nFramesPassed;
             
             planePitchAngle = 15.0 - (fmod((TIME - tStartLevelOff), pitchDownTime) / pitchDownTime) * 15.0;
             
@@ -1092,7 +1096,7 @@ void idle(void)
         } else if (TIME < tTouchdown) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
-            yPosPlane -= 0.8 / 30.0;
+            yPosPlane -= (0.8 / 30.0) * nFramesPassed;
             
             planeRollAngle = 0.0;
             
@@ -1101,7 +1105,6 @@ void idle(void)
         } else if (TIME < tEnd) {
             
             xPosPlane = xPosPlane + planeVelocity * TIME + 0.5 * planeAccel * pow(TIME, 2.0);
-            // yPosPlane = 0.0; // touchdown
             
             if (planeVelocity > 0.0) {
             
@@ -1169,6 +1172,8 @@ void idle(void)
             flgUpperLegAngle = 0.0;
             flgLowerLegAngle = 0.0;
         }
+        
+        prevTime = TIME;
 
         //Your code ends here
         
