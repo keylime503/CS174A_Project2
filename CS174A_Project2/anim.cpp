@@ -109,7 +109,7 @@ float tEndTurnLeft = 42.0;
 float tStartDescent = 44.0;
 float tGearDownStart = 47.0;
 float tGearDownEnd = 50.0;
-float tTouchdown = 55.5;
+float tTouchdown = 55.0;
 float tEnd = 60.0;
 
 //texture
@@ -746,7 +746,7 @@ void display(void)
         model_trans = mvstack.pop();
         mvstack.push(model_trans); // save ground plane location for control tower base
         model_trans *= Translate(150.0, 0.25, 0);
-        model_trans *= Scale(220.0, 0.1, 10.0);
+        model_trans *= Scale(240.0, 0.1, 10.0);
         model_view = view_trans * model_trans;
         set_colour(getRgbFloat(105), getRgbFloat(105), getRgbFloat(105)); // dim gray color
         drawCube();
@@ -968,11 +968,24 @@ void idle(void)
             eye = vec4(200.0, 1.0, 17.0, 1.0);
             ref = vec4(280.0, 24.0, 0.0, 1.0);
             
+        } else if (TIME < tGearDownStart - 1.0) {
+            
+            // watch cruise
+            eye = vec4(xPosPlane, yPosPlane, zPosPlane + 40.0, 1.0);
+            ref = vec4(xPosPlane, yPosPlane, zPosPlane, 1.0);
+        
+        } else if (TIME < tGearDownEnd + 1.0) {
+            
+            // Just look at the plane from the side
+            eye = vec4(xPosPlane + 30.0, yPosPlane - 10.0, zPosPlane + 15.0, 1.0);
+            ref = vec4(xPosPlane, yPosPlane, 1.0, 1.0);
+            
         } else {
             
-            // Just look at the plane from the ground
-            eye = vec4(xPosPlane, yPosPlane, zPosPlane + 50, 1.0);
-            ref = vec4(xPosPlane, yPosPlane, 1.0, 1.0);
+            // Watch landing
+            eye = vec4(1400.0, 1.0, 50.0, 1.0);
+            ref = vec4(xPosPlane, yPosPlane, zPosPlane, 1.0);
+            
         }
         
         /******************************/
